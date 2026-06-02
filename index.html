@@ -4,11 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>StudyBudy</title>
+  <!-- All styles live in styles.css — no inline styles anywhere in this file -->
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-  <!-- Navbar -->
+  <!-- =============================================
+       NAVBAR
+       Fixed at top; uses backdrop-filter blur.
+       Nav links (#about, #courses) are highlighted
+       dynamically by the IntersectionObserver in app.js.
+       ============================================= -->
   <header class="navbar">
     <div class="navbar-inner">
       <div class="logo">
@@ -16,20 +22,30 @@
         <span class="logo-text">StudyBudy</span>
       </div>
       <nav class="nav-links">
+        <!-- href values must match the id of the target <section> elements below -->
         <a href="#about">About</a>
         <a href="#courses">Courses</a>
       </nav>
     </div>
   </header>
 
-  <!-- Hero -->
+  <!-- =============================================
+       HERO SECTION  (id="about" — targeted by navbar)
+       Two-column layout: left = text content,
+       right = decorative floating cards + radial glow blob.
+       The floating cards animate via CSS @keyframes float.
+       ============================================= -->
   <section class="hero" id="about">
+
+    <!-- Left column: headline, subtitle, stats, CTA -->
     <div class="hero-content">
       <h1>Your Personal<br /><span class="accent">Study Companion</span></h1>
       <p class="hero-subtitle">
         StudyBudy helps you master your courses with organized materials,
         practice questions, and smart review tools — all in one place.
       </p>
+
+      <!-- Quick stats strip — update numbers here as courses/features are added -->
       <div class="hero-stats">
         <div class="stat">
           <span class="stat-number">2</span>
@@ -46,20 +62,31 @@
           <span class="stat-label">Goal: Pass</span>
         </div>
       </div>
+
+      <!-- Scrolls to #courses section -->
       <a href="#courses" class="btn-primary">Browse Courses</a>
     </div>
+
+    <!-- Right column: purely decorative, no interactive elements -->
     <div class="hero-visual">
+      <!-- card-a and card-b have different animation-delay values in CSS to stagger the float -->
       <div class="floating-card card-a">
         <span>☕</span> Java Basics
       </div>
       <div class="floating-card card-b">
         <span>📐</span> Linear Algebra
       </div>
+      <!-- Blurred radial gradient that gives the purple glow behind the cards -->
       <div class="hero-blob"></div>
     </div>
+
   </section>
 
-  <!-- Features -->
+  <!-- =============================================
+       FEATURES STRIP
+       Three static cards highlighting app benefits.
+       No interactivity — purely informational.
+       ============================================= -->
   <section class="features">
     <div class="features-inner">
       <div class="feature-item">
@@ -80,7 +107,15 @@
     </div>
   </section>
 
-  <!-- Courses -->
+  <!-- =============================================
+       COURSES SECTION  (id="courses" — targeted by navbar + hero CTA)
+       Grid of course cards. Each card has:
+         - a colored banner (.course-card-top) defined by a modifier class (e.g. java-bg)
+         - a body with tag, title, description, and action button
+       Buttons are disabled until the course page is built.
+       To add a new course, copy one card block and update the content.
+       Color modifier classes (java-bg, linalg-bg, ...) are defined in styles.css.
+       ============================================= -->
   <section class="courses-section" id="courses">
     <div class="courses-inner">
       <div class="section-header">
@@ -89,7 +124,9 @@
       </div>
       <div class="courses-grid">
 
+        <!-- Course card: Introduction to Computer Science with Java -->
         <div class="course-card">
+          <!-- java-bg: amber gradient defined in styles.css -->
           <div class="course-card-top java-bg">
             <span class="course-emoji">☕</span>
           </div>
@@ -97,11 +134,14 @@
             <span class="course-tag">Computer Science</span>
             <h3>Introduction to Computer Science with Java</h3>
             <p>Learn the fundamentals of programming and problem-solving using the Java language.</p>
+            <!-- disabled until the course page is implemented -->
             <button class="btn-course" disabled>Coming Soon</button>
           </div>
         </div>
 
+        <!-- Course card: Linear Algebra -->
         <div class="course-card">
+          <!-- linalg-bg: teal gradient defined in styles.css -->
           <div class="course-card-top linalg-bg">
             <span class="course-emoji">📐</span>
           </div>
@@ -109,6 +149,7 @@
             <span class="course-tag">Mathematics</span>
             <h3>Linear Algebra</h3>
             <p>Explore vectors, matrices, transformations, and the mathematical structures behind modern computing.</p>
+            <!-- disabled until the course page is implemented -->
             <button class="btn-course" disabled>Coming Soon</button>
           </div>
         </div>
@@ -117,11 +158,14 @@
     </div>
   </section>
 
-  <!-- Footer -->
+  <!-- =============================================
+       FOOTER
+       ============================================= -->
   <footer class="footer">
     <p>StudyBudy &copy; 2026 — built to help you succeed.</p>
   </footer>
 
+  <!-- app.js must load after the DOM so querySelectorAll finds the sections -->
   <script src="app.js"></script>
 </body>
 </html>

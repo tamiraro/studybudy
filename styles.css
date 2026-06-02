@@ -1,20 +1,32 @@
-/* ── Reset & Base ────────────────────────────── */
+/* =============================================
+   GLOBAL RESET & CSS VARIABLES
+   All color, spacing, and typography tokens live here.
+   Change a variable to update the theme everywhere at once.
+   ============================================= */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
+  /* Background layers — bg is the page, surface is cards/panels, surface-2 is nested elements */
   --bg: #0f1117;
   --surface: #1a1d27;
   --surface-2: #22263a;
   --border: #2e3350;
+
+  /* Text */
   --text: #e8eaf6;
   --text-muted: #8891b4;
+
+  /* Primary accent (purple) */
   --accent: #6c63ff;
   --accent-light: #8b85ff;
   --accent-glow: rgba(108, 99, 255, 0.25);
-  --java: #f89820;
+
+  /* Course color tokens — used for card banners */
+  --java: #f89820;           /* amber — Java course */
   --java-glow: rgba(248, 152, 32, 0.2);
-  --linalg: #00c8a0;
+  --linalg: #00c8a0;         /* teal — Linear Algebra course */
   --linalg-glow: rgba(0, 200, 160, 0.2);
+
   --radius: 14px;
   --radius-sm: 8px;
   --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -30,7 +42,12 @@ body {
   min-height: 100vh;
 }
 
-/* ── Navbar ──────────────────────────────────── */
+/* =============================================
+   NAVBAR
+   Fixed overlay with blur backdrop.
+   z-index 100 keeps it above all page content.
+   .nav-links a.active is toggled by app.js on scroll.
+   ============================================= */
 .navbar {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -76,7 +93,14 @@ body {
 
 .nav-links a:hover { color: var(--text); }
 
-/* ── Hero ────────────────────────────────────── */
+/* Active link state — class toggled by IntersectionObserver in app.js */
+.nav-links a.active { color: var(--text); }
+
+/* =============================================
+   HERO SECTION
+   Full-viewport two-column layout.
+   padding-top: 100px accounts for the fixed navbar height (60px) + breathing room.
+   ============================================= */
 .hero {
   min-height: 100vh;
   display: flex;
@@ -89,10 +113,11 @@ body {
 
 .hero-content {
   flex: 1;
-  min-width: 0;
+  min-width: 0; /* prevents flex child from overflowing */
 }
 
 .hero-content h1 {
+  /* clamp: min 2.2rem, fluid, max 3.4rem — scales with viewport width */
   font-size: clamp(2.2rem, 5vw, 3.4rem);
   font-weight: 800;
   line-height: 1.15;
@@ -100,6 +125,7 @@ body {
   margin-bottom: 20px;
 }
 
+/* Gradient text — requires both background-clip properties for cross-browser support */
 .accent {
   background: linear-gradient(135deg, var(--accent), var(--accent-light));
   -webkit-background-clip: text;
@@ -114,6 +140,7 @@ body {
   margin-bottom: 36px;
 }
 
+/* Stats row */
 .hero-stats {
   display: flex;
   align-items: center;
@@ -140,12 +167,14 @@ body {
   letter-spacing: 0.5px;
 }
 
+/* Vertical rule between stats */
 .stat-divider {
   width: 1px;
   height: 36px;
   background: var(--border);
 }
 
+/* Primary CTA button */
 .btn-primary {
   display: inline-block;
   padding: 13px 30px;
@@ -165,7 +194,7 @@ body {
   box-shadow: 0 8px 24px var(--accent-glow);
 }
 
-/* Hero visual */
+/* ── Hero right column: decorative visual ── */
 .hero-visual {
   flex: 1;
   position: relative;
@@ -175,6 +204,7 @@ body {
   min-height: 320px;
 }
 
+/* Radial purple glow behind the floating cards */
 .hero-blob {
   width: 320px;
   height: 320px;
@@ -183,6 +213,7 @@ body {
   filter: blur(40px);
 }
 
+/* Base style for both decorative floating cards */
 .floating-card {
   position: absolute;
   background: var(--surface);
@@ -200,6 +231,7 @@ body {
 
 .floating-card span { font-size: 1.2rem; }
 
+/* card-a: Java — amber border, starts animation immediately */
 .card-a {
   top: 30px;
   left: 60px;
@@ -207,6 +239,7 @@ body {
   animation-delay: 0s;
 }
 
+/* card-b: Linear Algebra — teal border, starts animation 2s later to stagger */
 .card-b {
   bottom: 50px;
   right: 40px;
@@ -219,7 +252,11 @@ body {
   50%       { transform: translateY(-12px); }
 }
 
-/* ── Features ────────────────────────────────── */
+/* =============================================
+   FEATURES STRIP
+   Three-column grid of app benefit cards.
+   Uses auto-fit so it collapses to fewer columns on small screens.
+   ============================================= */
 .features {
   background: var(--surface);
   border-top: 1px solid var(--border);
@@ -256,7 +293,12 @@ body {
   font-size: 0.9rem;
 }
 
-/* ── Courses ─────────────────────────────────── */
+/* =============================================
+   COURSES SECTION
+   Responsive grid of course cards.
+   auto-fill + minmax(300px) means cards wrap naturally;
+   no JS needed for layout.
+   ============================================= */
 .courses-section {
   padding: 80px 24px;
 }
@@ -287,11 +329,12 @@ body {
   gap: 24px;
 }
 
+/* Individual course card */
 .course-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  overflow: hidden;
+  overflow: hidden; /* clips the colored banner to the card's border-radius */
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
 
@@ -300,6 +343,7 @@ body {
   box-shadow: 0 12px 40px rgba(0,0,0,0.3);
 }
 
+/* Colored banner at top of each card — color set by modifier class */
 .course-card-top {
   height: 120px;
   display: flex;
@@ -307,20 +351,25 @@ body {
   justify-content: center;
 }
 
+/* ── Course color modifiers ──
+   To add a new course color: create a new [name]-bg class here,
+   plus a .course-card:hover .[name]-bg override for the brighter hover state.
+   ── */
+
+/* Java course: amber */
 .java-bg {
   background: linear-gradient(135deg, rgba(248, 152, 32, 0.15), rgba(248, 100, 32, 0.1));
   border-bottom: 1px solid rgba(248, 152, 32, 0.2);
 }
-
 .course-card:hover .java-bg {
   background: linear-gradient(135deg, rgba(248, 152, 32, 0.25), rgba(248, 100, 32, 0.15));
 }
 
+/* Linear Algebra course: teal */
 .linalg-bg {
   background: linear-gradient(135deg, rgba(0, 200, 160, 0.15), rgba(0, 150, 200, 0.1));
   border-bottom: 1px solid rgba(0, 200, 160, 0.2);
 }
-
 .course-card:hover .linalg-bg {
   background: linear-gradient(135deg, rgba(0, 200, 160, 0.25), rgba(0, 150, 200, 0.15));
 }
@@ -355,6 +404,7 @@ body {
   margin-bottom: 8px;
 }
 
+/* Disabled course button — shown until the course page is built */
 .btn-course {
   align-self: flex-start;
   padding: 8px 18px;
@@ -368,7 +418,9 @@ body {
   transition: background 0.2s;
 }
 
-/* ── Footer ──────────────────────────────────── */
+/* =============================================
+   FOOTER
+   ============================================= */
 .footer {
   text-align: center;
   padding: 28px 24px;
@@ -377,7 +429,10 @@ body {
   border-top: 1px solid var(--border);
 }
 
-/* ── Responsive ──────────────────────────────── */
+/* =============================================
+   RESPONSIVE — mobile breakpoint at 768px
+   Hero switches from two-column to single-column.
+   ============================================= */
 @media (max-width: 768px) {
   .hero {
     flex-direction: column;
@@ -391,6 +446,7 @@ body {
 
   .hero-visual { width: 100%; }
 
+  /* Shrink blob on mobile to avoid overflow */
   .hero-blob { width: 220px; height: 220px; }
 
   .card-a { top: 20px; left: 20px; }

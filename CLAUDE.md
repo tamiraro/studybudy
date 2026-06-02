@@ -25,6 +25,15 @@ Each course page (once built) should include:
 
 New courses can be added to the landing page grid at any time by adding a card to `index.html`.
 
+## Code comments
+
+All code — HTML, CSS, and JS — must include comments that help a debugger understand what is happening and why. This means:
+- Label each major section or block so its purpose is immediately clear
+- Explain non-obvious logic, calculations, or CSS tricks
+- Note any dependencies between sections (e.g. "this class is toggled by app.js")
+
+Comments should make it easy to locate and isolate any part of the UI without needing to run the app first.
+
 ## Git and GitHub — mandatory workflow
 
 **Every change, no matter how small, must be committed and pushed to GitHub.**
