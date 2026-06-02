@@ -25,6 +25,7 @@
       <nav class="nav-links">
         <a href="index.html">Home</a>
         <a href="index.html#courses">Courses</a>
+        <a href="login.html">Log In</a>
       </nav>
     </div>
   </header>
@@ -79,6 +80,23 @@
             <span class="field-error" id="lastNameError"></span>
           </div>
 
+        </div>
+
+        <!-- Username — placed after name so the user has context for what name to base it on.
+             Validation rules are enforced in signup.js: 3–20 chars, letters/numbers/underscores/hyphens,
+             must start with a letter or number. -->
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            placeholder="e.g. alex_cohen"
+            autocomplete="username"
+            spellcheck="false"
+          />
+          <span class="field-hint">3–20 characters. Letters, numbers, _ and - only.</span>
+          <span class="field-error" id="usernameError"></span>
         </div>
 
         <!-- Email -->
@@ -196,7 +214,7 @@
         <!-- Submit -->
         <button type="submit" class="btn-submit">Create Account</button>
 
-        <p class="signin-link">Already have an account? <a href="#">Sign in</a></p>
+        <p class="signin-link">Already have an account? <a href="login.html">Sign in</a></p>
 
       </form>
     </div>

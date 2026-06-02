@@ -1,0 +1,112 @@
+/* =============================================
+   LOGIN PAGE — layout and login-specific styles.
+   Shared form component styles (inputs, .field-error,
+   .btn-submit, .toggle-password, etc.) come from signup.css.
+   ============================================= */
+
+/* ── Page layout ── */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 90px 24px 48px;
+}
+
+/* ── Login card — narrower than signup since there are fewer fields ── */
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 40px 44px;
+}
+
+.login-header {
+  margin-bottom: 32px;
+}
+
+.login-header h1 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  margin-bottom: 6px;
+}
+
+.login-header p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* ── Password label row: label on left, "Forgot password?" on right ── */
+.password-label-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.forgot-link {
+  font-size: 0.78rem;
+  color: var(--accent-light);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.forgot-link:hover { text-decoration: underline; }
+
+/* ── Remember me checkbox row ── */
+.remember-row {
+  margin-bottom: 20px;
+}
+
+.remember-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  user-select: none;
+}
+
+/* Hide the native checkbox */
+.remember-label input[type="checkbox"] {
+  display: none;
+}
+
+/* Custom checkbox square */
+.remember-check {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+/* Checked state — driven by sibling selector when the hidden checkbox is :checked */
+.remember-label input[type="checkbox"]:checked + .remember-check {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Checkmark inside the box — shown only when checked */
+.remember-label input[type="checkbox"]:checked + .remember-check::after {
+  content: '✓';
+  font-size: 0.7rem;
+  color: #fff;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .login-card {
+    padding: 28px 20px;
+  }
+}

@@ -17,6 +17,7 @@
 const form              = document.getElementById('signupForm');
 const firstNameInput    = document.getElementById('firstName');
 const lastNameInput     = document.getElementById('lastName');
+const usernameInput     = document.getElementById('username');
 const emailInput        = document.getElementById('email');
 const phoneInput        = document.getElementById('phone');
 const passwordInput     = document.getElementById('password');
@@ -38,6 +39,23 @@ function validateName(value, label) {
     return { ok: false, msg: `${label} can only contain letters.` };
   if (value.trim().length < 2)
     return { ok: false, msg: `${label} must be at least 2 characters.` };
+  return { ok: true };
+}
+
+function validateUsername(value) {
+  const v = value.trim();
+  if (!v) return { ok: false, msg: 'Username is required.' };
+  if (v.length < 3)  return { ok: false, msg: 'Username must be at least 3 characters.' };
+  if (v.length > 20) return { ok: false, msg: 'Username cannot exceed 20 characters.' };
+  /* Must start with a letter or digit — not _ or - */
+  if (!/^[A-Za-z0-9]/.test(v))
+    return { ok: false, msg: 'Username must start with a letter or number.' };
+  /* Only letters, numbers, underscores, hyphens */
+  if (!/^[A-Za-z0-9_-]+$/.test(v))
+    return { ok: false, msg: 'Only letters, numbers, _ and - are allowed.' };
+  /* Cannot end with _ or - (common convention) */
+  if (/[_-]$/.test(v))
+    return { ok: false, msg: 'Username cannot end with _ or -.' };
   return { ok: true };
 }
 
@@ -148,6 +166,14 @@ function runLastName() {
   return r.ok;
 }
 
+function runUsername() {
+  const r = validateUsername(usernameInput.value);
+  r.ok
+    ? clearError(usernameInput, document.getElementById('usernameError'))
+    : showError(usernameInput, document.getElementById('usernameError'), r.msg);
+  return r.ok;
+}
+
 function runEmail() {
   const r = validateEmail(emailInput.value);
   r.ok
@@ -201,6 +227,7 @@ function runConfirm() {
    ============================================= */
 firstNameInput.addEventListener('blur', runFirstName);
 lastNameInput.addEventListener('blur',  runLastName);
+usernameInput.addEventListener('blur',  runUsername);
 emailInput.addEventListener('blur',     runEmail);
 phoneInput.addEventListener('blur',     runPhone);
 passwordInput.addEventListener('blur',  runPassword);
@@ -220,6 +247,7 @@ function makeLiveValidator(inputEl, runner) {
 
 makeLiveValidator(firstNameInput, runFirstName);
 makeLiveValidator(lastNameInput,  runLastName);
+makeLiveValidator(usernameInput,  runUsername);
 makeLiveValidator(emailInput,     runEmail);
 makeLiveValidator(phoneInput,     runPhone);
 makeLiveValidator(passwordInput,  () => { runPassword(); if (confirmInput.value) runConfirm(); });
@@ -326,6 +354,7 @@ form.addEventListener('submit', (e) => {
   const results = [
     runFirstName(),
     runLastName(),
+    runUsername(),
     runEmail(),
     runPhone(),
     runRole(),
@@ -354,6 +383,7 @@ form.addEventListener('submit', (e) => {
   const data = {
     firstName: firstNameInput.value.trim(),
     lastName:  lastNameInput.value.trim(),
+    username:  usernameInput.value.trim(),
     email:     emailInput.value.trim(),
     phone:     phoneInput.value.trim(),
     role:      form.querySelector('input[name="role"]:checked').value,

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Log In — StudyBudy</title>
+  <!-- Shared base: CSS variables and reset -->
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Shared form component styles (inputs, errors, buttons, etc.) -->
+  <link rel="stylesheet" href="signup.css" />
+  <!-- Login-specific layout and overrides -->
+  <link rel="stylesheet" href="login.css" />
+</head>
+<body>
+
+  <!-- =============================================
+       NAVBAR — identical structure to all other pages.
+       "Sign Up" pill links to signup.html.
+       ============================================= -->
+  <header class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="logo" style="text-decoration:none;color:inherit;">
+        <span class="logo-icon">📚</span>
+        <span class="logo-text">StudyBudy</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#courses">Courses</a>
+        <a href="signup.html" class="nav-signup">Sign Up</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- =============================================
+       LOGIN PAGE WRAPPER
+       Centers the card vertically and horizontally.
+       ============================================= -->
+  <main class="login-page">
+    <div class="login-card">
+
+      <!-- Card header -->
+      <div class="login-header">
+        <h1>Welcome back</h1>
+        <p>Log in to continue studying.</p>
+      </div>
+
+      <!-- =============================================
+           LOGIN FORM
+           All validation is handled in login.js.
+           Identifier accepts either a username or email address.
+           Error display follows the same pattern as signup:
+             .field-error becomes visible when login.js adds .visible.
+           ============================================= -->
+      <form id="loginForm" novalidate>
+
+        <!-- Identifier: username or email (either is accepted) -->
+        <div class="form-group">
+          <label for="identifier">Username or Email</label>
+          <input
+            type="text"
+            id="identifier"
+            name="identifier"
+            placeholder="e.g. alex_cohen or you@example.com"
+            autocomplete="username"
+            spellcheck="false"
+          />
+          <span class="field-error" id="identifierError"></span>
+        </div>
+
+        <!-- Password with show/hide toggle -->
+        <div class="form-group">
+          <div class="password-label-row">
+            <label for="loginPassword">Password</label>
+            <!-- Placeholder link — no backend yet -->
+            <a href="#" class="forgot-link">Forgot password?</a>
+          </div>
+          <div class="input-wrapper">
+            <input
+              type="password"
+              id="loginPassword"
+              name="password"
+              placeholder="Your password"
+              autocomplete="current-password"
+            />
+            <!-- Toggle button controlled by login.js -->
+            <button type="button" class="toggle-password" data-target="loginPassword" aria-label="Show password">👁</button>
+          </div>
+          <span class="field-error" id="loginPasswordError"></span>
+        </div>
+
+        <!-- Remember me checkbox -->
+        <div class="remember-row">
+          <label class="remember-label">
+            <input type="checkbox" id="rememberMe" name="rememberMe" />
+            <span class="remember-check"></span>
+            Keep me logged in
+          </label>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-submit">Log In</button>
+
+        <p class="signin-link">Don't have an account? <a href="signup.html">Sign up</a></p>
+
+      </form>
+    </div>
+  </main>
+
+  <script src="login.js"></script>
+</body>
+</html>

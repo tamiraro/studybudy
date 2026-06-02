@@ -140,6 +140,13 @@
    ERROR MESSAGES
    Hidden by default; signup.js adds .visible to show them.
    ============================================= */
+/* Soft hint shown below a field (not an error — no red color) */
+.field-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: -2px;
+}
+
 .field-error {
   font-size: 0.78rem;
   color: #f87171;
