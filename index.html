@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyBudy</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="navbar-inner">
+      <div class="logo">
+        <span class="logo-icon">📚</span>
+        <span class="logo-text">StudyBudy</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#about">About</a>
+        <a href="#courses">Courses</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero" id="about">
+    <div class="hero-content">
+      <h1>Your Personal<br /><span class="accent">Study Companion</span></h1>
+      <p class="hero-subtitle">
+        StudyBudy helps you master your courses with organized materials,
+        practice questions, and smart review tools — all in one place.
+      </p>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-number">2</span>
+          <span class="stat-label">Courses</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-number">∞</span>
+          <span class="stat-label">Practice</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-number">1</span>
+          <span class="stat-label">Goal: Pass</span>
+        </div>
+      </div>
+      <a href="#courses" class="btn-primary">Browse Courses</a>
+    </div>
+    <div class="hero-visual">
+      <div class="floating-card card-a">
+        <span>☕</span> Java Basics
+      </div>
+      <div class="floating-card card-b">
+        <span>📐</span> Linear Algebra
+      </div>
+      <div class="hero-blob"></div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features">
+    <div class="features-inner">
+      <div class="feature-item">
+        <div class="feature-icon">🎯</div>
+        <h3>Focused Learning</h3>
+        <p>Course-specific content so you study what actually matters for your exam.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🔁</div>
+        <h3>Active Recall</h3>
+        <p>Practice problems and flashcards that force your brain to retrieve knowledge.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">📈</div>
+        <h3>Track Progress</h3>
+        <p>See exactly where you stand and what still needs work before the test.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Courses -->
+  <section class="courses-section" id="courses">
+    <div class="courses-inner">
+      <div class="section-header">
+        <h2>Your Courses</h2>
+        <p>Pick a course to start studying</p>
+      </div>
+      <div class="courses-grid">
+
+        <div class="course-card">
+          <div class="course-card-top java-bg">
+            <span class="course-emoji">☕</span>
+          </div>
+          <div class="course-card-body">
+            <span class="course-tag">Computer Science</span>
+            <h3>Introduction to Computer Science with Java</h3>
+            <p>Learn the fundamentals of programming and problem-solving using the Java language.</p>
+            <button class="btn-course" disabled>Coming Soon</button>
+          </div>
+        </div>
+
+        <div class="course-card">
+          <div class="course-card-top linalg-bg">
+            <span class="course-emoji">📐</span>
+          </div>
+          <div class="course-card-body">
+            <span class="course-tag">Mathematics</span>
+            <h3>Linear Algebra</h3>
+            <p>Explore vectors, matrices, transformations, and the mathematical structures behind modern computing.</p>
+            <button class="btn-course" disabled>Coming Soon</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>StudyBudy &copy; 2026 — built to help you succeed.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
