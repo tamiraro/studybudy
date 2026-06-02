@@ -6,33 +6,29 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 StudyBudy is a web-based study helper that gives students a dedicated space for each of their courses. The core idea: instead of scattered notes and resources, each course gets its own section with organized materials, practice questions, and review tools.
 
-The app is built incrementally — the landing page comes first, then each course gets fleshed out one at a time as the user defines it.
+The app is built incrementally — the landing page and user system come first, then each course is fleshed out one topic at a time.
 
-## Current courses
+## Current state
 
-- **Introduction to Computer Science with Java** — fundamentals of programming and problem-solving in Java
-- **Linear Algebra** — vectors, matrices, transformations, and their applications
+**Courses on the landing page:**
+- **Introduction to Computer Science with Java** — live, links to `courses/java/index.html`. Has a course intro and a Recursion topic stub (Coming Soon).
+- **Linear Algebra** — listed on the landing page, button still disabled (no course page yet).
 
-Both courses are listed on the landing page but not yet defined (buttons show "Coming Soon").
+**User system:**
+- `signup.html` — registration form (first name, last name, username, email, phone, role, courses, password). Client-side validation only; no backend yet.
+- `login.html` — login form (username or email + password). Client-side validation only.
 
-## Planned direction
-
-Each course page (once built) should include:
-- Course overview and key topics
-- Study materials / notes per topic
-- Practice questions with answers
+**Planned direction for each course page:**
+- Course overview and intro
+- Topics list, each topic linking to its own page with study materials, notes, and practice questions
 - Progress tracking
-
-New courses can be added to the landing page grid at any time by adding a card to `index.html`.
 
 ## Code comments
 
-All code — HTML, CSS, and JS — must include comments that help a debugger understand what is happening and why. This means:
+All code — HTML, CSS, and JS — must include comments that help a debugger understand what is happening and why:
 - Label each major section or block so its purpose is immediately clear
 - Explain non-obvious logic, calculations, or CSS tricks
-- Note any dependencies between sections (e.g. "this class is toggled by app.js")
-
-Comments should make it easy to locate and isolate any part of the UI without needing to run the app first.
+- Note dependencies between files (e.g. "this class is toggled by app.js")
 
 ## Git and GitHub — mandatory workflow
 
@@ -40,33 +36,59 @@ Comments should make it easy to locate and isolate any part of the UI without ne
 
 Repository: `https://github.com/tamiraro/studybudy` (branch: `master`)
 
-Steps after any edit:
 ```
 git add <changed files>
 git commit -m "descriptive message"
 git push
 ```
 
-There is no CI or review process — push directly to `master`.
+No CI — push directly to `master`.
 
 ## Running the app
 
 Open `index.html` directly in a browser — no build step, no server required.
 
-To verify changes headlessly (Edge must be installed):
+Headless screenshot (Edge):
 ```
 & "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --headless --screenshot=screenshot.png --window-size=1280,900 --disable-gpu "file:///C:/Users/tamir1/Desktop/Programming/studybudy/index.html"
 ```
 
-## Architecture
+## File structure and CSS architecture
 
-Zero-dependency static web app — three files, no framework, no bundler.
+```
+index.html          — landing page
+styles.css          — global CSS variables, reset, navbar, hero, courses grid, footer
+app.js              — scroll-driven nav highlight (IntersectionObserver)
 
-- **`index.html`** — all markup. Sections in order: navbar, hero, features strip, courses grid, footer.
-- **`styles.css`** — all styling. Dark theme driven by CSS custom properties on `:root` (`--accent`, `--surface`, etc.).
-- **`app.js`** — minimal JS. Currently drives the active nav-link highlight via `IntersectionObserver`.
+signup.html/css/js  — registration page
+login.html          — login page (uses styles.css + signup.css + login.css)
+login.css           — login page layout; signup.css provides shared form component styles
+login.js            — login validation
 
-## Adding a course card
+courses/
+  course.css        — shared layout for all course pages (hero, sections, subject cards)
+  java/
+    index.html      — Java course overview (intro + topics list)
+```
+
+**CSS layering rule:** `styles.css` defines all global tokens (`--accent`, `--surface`, etc.). Every other CSS file inherits from it and must not redefine `:root` variables. `signup.css` doubles as the shared form-component library (inputs, errors, buttons) — `login.html` links to it for that reason.
+
+**CSS cascade note:** When two classes on the same element conflict, the one declared *later* in the file wins. `.btn-course-active` must stay after `.btn-course` in `styles.css` so its `cursor: pointer` overrides `cursor: not-allowed`.
+
+## Signup field validation rules
+
+| Field | Rules |
+|---|---|
+| First / Last name | Required, letters only (incl. accented), min 2 chars |
+| Username | 3–20 chars, letters/numbers/`_`/`-`, must start and end with letter or number |
+| Email | Standard `x@x.x` pattern |
+| Phone | 7–15 digits; allows `+`, spaces, `-`, `()`, `.` |
+| Role | Must pick Student or Teacher |
+| Courses | At least one selected |
+| Password | Min 8 chars, ≥1 uppercase, ≥1 digit |
+| Confirm password | Must match password |
+
+## Adding a course card to the landing page
 
 ```html
 <div class="course-card">
@@ -77,9 +99,28 @@ Zero-dependency static web app — three files, no framework, no bundler.
     <span class="course-tag">[Category]</span>
     <h3>[Course name]</h3>
     <p>[Description]</p>
+    <!-- disabled until the course page exists: -->
     <button class="btn-course" disabled>Coming Soon</button>
+    <!-- once the page exists, replace the button with: -->
+    <!-- <a href="courses/[name]/index.html" class="btn-course btn-course-active">Open Course</a> -->
   </div>
 </div>
 ```
 
-Existing color variants in `styles.css`: `java-bg` (amber), `linalg-bg` (teal). Add new variants there for additional courses.
+Color variants in `styles.css`: `java-bg` (amber), `linalg-bg` (teal). Add new variants for additional courses.
+
+## Adding a topic to a course page
+
+In the course `index.html`, inside `.subjects-grid`:
+
+```html
+<div class="subject-card">
+  <div class="subject-card-left">
+    <span class="subject-number">01</span>
+    <span class="subject-name">Topic Name</span>
+  </div>
+  <span class="subject-status coming-soon">Coming Soon</span>
+</div>
+```
+
+When the topic page is ready, add class `available` to `.subject-card` and wrap it in an `<a>` tag. Subject card styles live in `courses/course.css`.
