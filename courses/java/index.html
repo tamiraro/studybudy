@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Intro to CS with Java — StudyBudy</title>
+  <!-- Shared base: CSS variables and reset -->
+  <link rel="stylesheet" href="../../styles.css" />
+  <!-- Shared course page layout -->
+  <link rel="stylesheet" href="../course.css" />
+</head>
+<body>
+
+  <!-- =============================================
+       NAVBAR
+       Paths are relative: two levels up (../../) to reach root files.
+       ============================================= -->
+  <header class="navbar">
+    <div class="navbar-inner">
+      <a href="../../index.html" class="logo" style="text-decoration:none;color:inherit;">
+        <span class="logo-icon">📚</span>
+        <span class="logo-text">StudyBudy</span>
+      </a>
+      <nav class="nav-links">
+        <a href="../../index.html">Home</a>
+        <a href="../../index.html#courses">Courses</a>
+        <a href="../../login.html">Log In</a>
+        <a href="../../signup.html" class="nav-signup">Sign Up</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- =============================================
+       COURSE HERO
+       Identifies the course with its emoji, tag, full name,
+       and a one-line tagline.
+       ============================================= -->
+  <div class="course-hero">
+    <span class="course-hero-tag">Computer Science</span>
+    <div class="course-hero-title">
+      <span class="course-hero-emoji">☕</span>
+      <h1>Introduction to Computer Science with Java</h1>
+    </div>
+    <p class="course-hero-subtitle">
+      Your first step into programming — no experience needed.
+      Learn how computers think, how to write code, and how to
+      solve problems systematically using Java.
+    </p>
+  </div>
+
+  <hr class="course-divider" />
+
+  <!-- =============================================
+       INTRODUCTION SECTION
+       A concise overview of what the course is about,
+       who it's for, and what students will gain.
+       ============================================= -->
+  <section class="course-section course-intro">
+    <h2 class="course-section-title">About this course</h2>
+
+    <p>
+      This course introduces the core ideas of computer science through one of the
+      world's most widely used programming languages — Java. You'll start from scratch:
+      understanding what a program is, how to write instructions a computer can follow,
+      and how to think about problems in a structured way.
+    </p>
+
+    <p>
+      Along the way you'll get hands-on with the building blocks every programmer
+      relies on — variables, conditions, loops, methods, and objects. Each topic
+      is built on top of the last, so by the end you'll have a real mental model
+      of how software works, not just surface-level syntax.
+    </p>
+
+    <p>
+      No prior experience is required. If you've never written a line of code before,
+      this is exactly the right place to start.
+    </p>
+  </section>
+
+  <hr class="course-divider" />
+
+  <!-- =============================================
+       SUBJECTS SECTION
+       Lists all topics covered in this course.
+       Each .subject-card represents one topic.
+       Cards with class "available" will link to the topic page
+       once content is added. Cards without it are placeholders.
+
+       To add a new subject:
+         1. Copy a .subject-card block below.
+         2. Update the number, name, and status badge.
+         3. When content is ready, add class "available" to the card
+            and wrap it in an <a> tag pointing to the topic page.
+       ============================================= -->
+  <section class="course-section">
+    <h2 class="course-section-title">Topics</h2>
+
+    <div class="subjects-grid">
+
+      <!-- Topic 1: Recursion — listed but content not yet defined -->
+      <div class="subject-card">
+        <div class="subject-card-left">
+          <span class="subject-number">01</span>
+          <span class="subject-name">Recursion</span>
+        </div>
+        <span class="subject-status coming-soon">Coming Soon</span>
+      </div>
+
+    </div>
+  </section>
+
+</body>
+</html>
