@@ -416,20 +416,6 @@ body {
 }
 
 /* Disabled course button — shown until the course page is built */
-/* Active variant — used when the course page exists */
-.btn-course-active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.btn-course-active:hover {
-  background: var(--accent-light);
-  border-color: var(--accent-light);
-}
-
 .btn-course {
   align-self: flex-start;
   padding: 8px 18px;
@@ -441,6 +427,20 @@ body {
   border: 1px solid var(--border);
   color: var(--text-muted);
   transition: background 0.2s;
+}
+
+/* Active variant — must come AFTER .btn-course so its cursor/color overrides it */
+.btn-course-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-course-active:hover {
+  background: var(--accent-light);
+  border-color: var(--accent-light);
 }
 
 /* =============================================
