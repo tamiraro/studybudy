@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up — StudyBudy</title>
+  <!-- Shared base: CSS variables and reset -->
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Page-specific signup styles -->
+  <link rel="stylesheet" href="signup.css" />
+</head>
+<body>
+
+  <!-- =============================================
+       NAVBAR — same structure as index.html.
+       "Sign Up" link is replaced with "Log In" placeholder
+       so the user knows where they are.
+       ============================================= -->
+  <header class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="logo" style="text-decoration:none;color:inherit;">
+        <span class="logo-icon">📚</span>
+        <span class="logo-text">StudyBudy</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#courses">Courses</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- =============================================
+       SIGNUP PAGE WRAPPER
+       Centers the form card vertically and horizontally.
+       ============================================= -->
+  <main class="signup-page">
+    <div class="signup-card">
+
+      <!-- Card header -->
+      <div class="signup-header">
+        <h1>Create your account</h1>
+        <p>Join StudyBudy and start studying smarter.</p>
+      </div>
+
+      <!-- =============================================
+           SIGNUP FORM
+           All validation is handled in signup.js.
+           Each field group follows the pattern:
+             .form-group > label + input/select + .field-error
+           .field-error is hidden by default; signup.js shows it
+           by adding the class .visible when the field is invalid.
+           ============================================= -->
+      <form id="signupForm" novalidate>
+
+        <!-- Row: First name + Last name side by side -->
+        <div class="form-row">
+
+          <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input
+              type="text"
+              id="firstName"
+              name="firstName"
+              placeholder="e.g. Alex"
+              autocomplete="given-name"
+            />
+            <span class="field-error" id="firstNameError"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input
+              type="text"
+              id="lastName"
+              name="lastName"
+              placeholder="e.g. Cohen"
+              autocomplete="family-name"
+            />
+            <span class="field-error" id="lastNameError"></span>
+          </div>
+
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="you@example.com"
+            autocomplete="email"
+          />
+          <span class="field-error" id="emailError"></span>
+        </div>
+
+        <!-- Phone number -->
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            placeholder="e.g. 050-123-4567"
+            autocomplete="tel"
+          />
+          <span class="field-error" id="phoneError"></span>
+        </div>
+
+        <!-- Account type: Student or Teacher -->
+        <div class="form-group">
+          <label>I am a…</label>
+          <!-- Role cards are radio inputs styled as clickable tiles -->
+          <div class="role-picker" id="rolePicker">
+            <label class="role-card" id="roleStudentCard">
+              <input type="radio" name="role" value="student" />
+              <span class="role-icon">🎓</span>
+              <span class="role-label">Student</span>
+            </label>
+            <label class="role-card" id="roleTeacherCard">
+              <input type="radio" name="role" value="teacher" />
+              <span class="role-icon">👨‍🏫</span>
+              <span class="role-label">Teacher</span>
+            </label>
+          </div>
+          <span class="field-error" id="roleError"></span>
+        </div>
+
+        <!-- Courses selection — checkboxes, one per available course.
+             To add a new course later: copy a .course-checkbox-card and update
+             the value + label to match the new course name. -->
+        <div class="form-group" id="coursesGroup">
+          <label>Courses I want to study</label>
+          <div class="courses-picker">
+
+            <label class="course-checkbox-card" id="courseJavaCard">
+              <input type="checkbox" name="courses" value="intro-java" />
+              <span class="course-cb-icon">☕</span>
+              <span class="course-cb-label">Intro to CS with Java</span>
+              <!-- Checkmark shown when selected — toggled via CSS + :checked -->
+              <span class="course-cb-check">✓</span>
+            </label>
+
+            <label class="course-checkbox-card" id="courseLinalgCard">
+              <input type="checkbox" name="courses" value="linear-algebra" />
+              <span class="course-cb-icon">📐</span>
+              <span class="course-cb-label">Linear Algebra</span>
+              <span class="course-cb-check">✓</span>
+            </label>
+
+          </div>
+          <span class="field-error" id="coursesError"></span>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrapper">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Min. 8 characters"
+              autocomplete="new-password"
+            />
+            <!-- Toggle button reveals/hides password — controlled by signup.js -->
+            <button type="button" class="toggle-password" data-target="password" aria-label="Show password">👁</button>
+          </div>
+          <!-- Strength bar: segments fill as password gets stronger -->
+          <div class="strength-bar" id="strengthBar">
+            <div class="strength-seg" id="seg1"></div>
+            <div class="strength-seg" id="seg2"></div>
+            <div class="strength-seg" id="seg3"></div>
+            <div class="strength-seg" id="seg4"></div>
+          </div>
+          <span class="strength-label" id="strengthLabel"></span>
+          <span class="field-error" id="passwordError"></span>
+        </div>
+
+        <!-- Confirm password -->
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <div class="input-wrapper">
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              placeholder="Repeat your password"
+              autocomplete="new-password"
+            />
+            <button type="button" class="toggle-password" data-target="confirmPassword" aria-label="Show password">👁</button>
+          </div>
+          <span class="field-error" id="confirmPasswordError"></span>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-submit">Create Account</button>
+
+        <p class="signin-link">Already have an account? <a href="#">Sign in</a></p>
+
+      </form>
+    </div>
+  </main>
+
+  <script src="signup.js"></script>
+</body>
+</html>

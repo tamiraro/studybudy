@@ -96,6 +96,17 @@ body {
 /* Active link state — class toggled by IntersectionObserver in app.js */
 .nav-links a.active { color: var(--text); }
 
+/* Sign Up pill — styled differently from plain nav links */
+.nav-links a.nav-signup {
+  background: var(--accent);
+  color: #fff;
+  padding: 6px 16px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  transition: background 0.2s;
+}
+.nav-links a.nav-signup:hover { background: var(--accent-light); color: #fff; }
+
 /* =============================================
    HERO SECTION
    Full-viewport two-column layout.

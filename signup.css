@@ -1,0 +1,385 @@
+/* =============================================
+   SIGNUP PAGE — page-specific styles.
+   Relies on CSS variables defined in styles.css (:root).
+   Does NOT redefine global reset or navbar styles.
+   ============================================= */
+
+/* ── Page layout: center the card vertically ── */
+.signup-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 90px 24px 48px; /* top padding = navbar height + breathing room */
+}
+
+/* ── Signup card ── */
+.signup-card {
+  width: 100%;
+  max-width: 560px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 40px 44px;
+}
+
+.signup-header {
+  margin-bottom: 32px;
+}
+
+.signup-header h1 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  margin-bottom: 6px;
+}
+
+.signup-header p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* =============================================
+   FORM LAYOUT
+   ============================================= */
+
+/* Side-by-side row (used for first name + last name) */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Standard field wrapper */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* =============================================
+   INPUTS
+   Base state, focus state, and error state.
+   Error state (.invalid) is added by signup.js.
+   ============================================= */
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="tel"],
+.form-group input[type="password"] {
+  width: 100%;
+  padding: 11px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-family: var(--font);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+/* Focus: purple ring */
+.form-group input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* Error state: red ring — class added by signup.js */
+.form-group input.invalid {
+  border-color: #f87171;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.2);
+}
+
+/* Valid state: green ring — class added by signup.js */
+.form-group input.valid {
+  border-color: #34d399;
+  box-shadow: none;
+}
+
+/* ── Input with eye-toggle button ── */
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper input {
+  padding-right: 44px; /* room for the toggle button */
+}
+
+/* Eye icon button inside the password input */
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--text-muted);
+  padding: 0;
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.toggle-password:hover { opacity: 1; }
+
+/* =============================================
+   ERROR MESSAGES
+   Hidden by default; signup.js adds .visible to show them.
+   ============================================= */
+.field-error {
+  font-size: 0.78rem;
+  color: #f87171;
+  min-height: 16px; /* reserves space so layout doesn't jump */
+  display: none;   /* hidden — signup.js toggles .visible */
+}
+
+.field-error.visible {
+  display: block;
+}
+
+/* =============================================
+   ROLE PICKER (Student / Teacher)
+   Two side-by-side radio cards.
+   The hidden <input type="radio"> drives the selected state;
+   the card appearance is controlled via :has(:checked) and
+   a .selected class added by signup.js (for broader browser support).
+   ============================================= */
+.role-picker {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.role-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 12px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  user-select: none;
+}
+
+/* Hide the native radio button — the card itself is the clickable area */
+.role-card input[type="radio"] {
+  display: none;
+}
+
+.role-icon { font-size: 1.8rem; }
+
+.role-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+
+/* Selected state — .selected class added by signup.js when radio is checked */
+.role-card.selected {
+  border-color: var(--accent);
+  background: rgba(108, 99, 255, 0.08);
+}
+
+.role-card.selected .role-label {
+  color: var(--accent-light);
+}
+
+/* Error state on role picker — border turns red when submitted without a choice */
+.role-picker.invalid .role-card {
+  border-color: #f87171;
+}
+
+/* =============================================
+   COURSE CHECKBOX CARDS
+   Same concept as role cards but multi-select.
+   ============================================= */
+.courses-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.course-checkbox-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  user-select: none;
+  position: relative;
+}
+
+/* Hide native checkbox */
+.course-checkbox-card input[type="checkbox"] {
+  display: none;
+}
+
+.course-cb-icon { font-size: 1.3rem; }
+
+.course-cb-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  flex: 1;
+  transition: color 0.2s;
+}
+
+/* Checkmark badge — hidden until card is selected */
+.course-cb-check {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent-light);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(108, 99, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+/* Selected state — .selected class added by signup.js */
+.course-checkbox-card.selected {
+  border-color: var(--accent);
+  background: rgba(108, 99, 255, 0.06);
+}
+
+.course-checkbox-card.selected .course-cb-label {
+  color: var(--text);
+}
+
+.course-checkbox-card.selected .course-cb-check {
+  opacity: 1;
+}
+
+/* Error state on courses picker */
+.courses-picker.invalid .course-checkbox-card {
+  border-color: #f87171;
+}
+
+/* =============================================
+   PASSWORD STRENGTH BAR
+   Four segments fill progressively as strength grows.
+   Segment colors: red → orange → yellow → green.
+   signup.js controls which segments get .active and which color class.
+   ============================================= */
+.strength-bar {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.strength-seg {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  transition: background 0.3s;
+}
+
+/* Strength levels — class set by signup.js on each segment */
+.strength-seg.weak    { background: #f87171; }
+.strength-seg.fair    { background: #fb923c; }
+.strength-seg.good    { background: #fbbf24; }
+.strength-seg.strong  { background: #34d399; }
+
+.strength-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  min-height: 16px;
+}
+
+/* =============================================
+   SUBMIT BUTTON
+   ============================================= */
+.btn-submit {
+  width: 100%;
+  padding: 13px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  margin-top: 8px;
+}
+
+.btn-submit:hover {
+  background: var(--accent-light);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px var(--accent-glow);
+}
+
+/* Shake animation — applied by signup.js when form is submitted with errors */
+.btn-submit.shake {
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-6px); }
+  40%       { transform: translateX(6px); }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX(4px); }
+}
+
+.signin-link {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.signin-link a {
+  color: var(--accent-light);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.signin-link a:hover { text-decoration: underline; }
+
+/* =============================================
+   RESPONSIVE — collapse two-column rows on narrow screens
+   ============================================= */
+@media (max-width: 600px) {
+  .signup-card {
+    padding: 28px 20px;
+  }
+
+  /* Stack first name + last name vertically on mobile */
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  /* Stack role cards vertically on mobile */
+  .role-picker {
+    grid-template-columns: 1fr;
+  }
+}
