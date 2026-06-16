@@ -1,24 +1,21 @@
 /* =============================================
    DASHBOARD
-   Manages the authenticated user's course library.
+   Loads and manages the user's course library via the REST API.
 
-   Storage:
-     sb_user    — { firstName, lastName, username, email }
-     sb_courses — Array of course objects
-
-   Each course: { id, name, emoji, color, notes, questions[], createdAt, lastStudied }
+   All data lives in the MS Access database (backend/).
+   The only things still in localStorage are:
+     sb_token — bearer token for API auth
+     sb_user  — public user info for display (name, etc.)
+     sb_apikey — the user's Anthropic API key (not ours)
    ============================================= */
 
 /* ── Constants ─────────────────────────────── */
-
-/* Preset emojis for the course icon picker */
 const EMOJIS = [
   '📚', '🧪', '📐', '💻', '🌍', '📝', '🔬', '🎭',
   '🎨', '🎵', '🏛️', '⚡', '🧠', '🌱', '⚗️', '🔭',
   '🦁', '🏔️', '💡', '🎯',
 ];
 
-/* Preset colors for the course card banner */
 const COLORS = [
   { id: 'purple', hex: '#6c63ff' },
   { id: 'blue',   hex: '#4361ee' },
@@ -29,9 +26,9 @@ const COLORS = [
 ];
 
 /* ── Auth guard ─────────────────────────────── */
-/* Redirect to login if no user session exists in localStorage */
-const user = JSON.parse(localStorage.getItem('sb_user') || 'null');
-if (!user) window.location.href = 'login.html';
+/* apiFetch (from api.js) already handles 401, but guard here too
+   so unauthenticated users never even see the page flash */
+if (!getToken()) window.location.href = 'login.html';
 
 /* ── State ─────────────────────────────────── */
 let selectedEmoji = EMOJIS[0];
@@ -54,30 +51,45 @@ const emojiPickerEl    = document.getElementById('emojiPicker');
 const colorPickerEl    = document.getElementById('colorPicker');
 
 /* ── Initialise ─────────────────────────────── */
-userGreeting.textContent = `Hi, ${user.firstName}`;
-loadCourses();
+const user = getUser();
+userGreeting.textContent = user ? `Hi, ${user.first_name || user.firstName}` : '';
+
 buildEmojiPicker();
 buildColorPicker();
-renderCourses();
+loadCourses();
 
 /* ── Logout ─────────────────────────────────── */
-logoutBtn.addEventListener('click', () => {
-  localStorage.removeItem('sb_user');
+logoutBtn.addEventListener('click', async () => {
+  /* Best-effort server-side token invalidation */
+  try { await apiFetch('DELETE', '/api/auth/logout'); } catch (_) {}
+  clearSession();
   window.location.href = 'index.html';
 });
 
-/* ── Modal — open / close ───────────────────── */
+/* ── Load courses from API ──────────────────── */
+async function loadCourses() {
+  try {
+    courses = await apiFetch('GET', '/api/courses');
+    renderCourses();
+  } catch (err) {
+    dashCoursesGrid.innerHTML =
+      `<p style="color:var(--text-muted);padding:24px">
+        Could not load courses: ${escapeHtml(err.message)}
+      </p>`;
+    emptyState.style.display = 'none';
+  }
+}
+
+/* ── Modal open / close ─────────────────────── */
 function openModal() {
-  /* Reset the form state before showing */
   courseNameInput.value = '';
   courseNameInput.classList.remove('invalid');
   courseNameError.classList.remove('visible');
   courseNameError.textContent = '';
   selectedEmoji = EMOJIS[0];
   selectedColor = COLORS[0].id;
-  buildEmojiPicker(); /* re-render to reset selection highlight */
+  buildEmojiPicker();
   buildColorPicker();
-
   modalOverlay.classList.add('active');
   modalOverlay.setAttribute('aria-hidden', 'false');
   courseNameInput.focus();
@@ -91,18 +103,12 @@ function closeModal() {
 btnNewCourse.addEventListener('click', openModal);
 emptyNewCourse.addEventListener('click', openModal);
 modalClose.addEventListener('click', closeModal);
-
-/* Close on backdrop click */
-modalOverlay.addEventListener('click', (e) => {
-  if (e.target === modalOverlay) closeModal();
-});
-
-/* Close on Escape key */
+modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && modalOverlay.classList.contains('active')) closeModal();
 });
 
-/* ── Emoji picker ───────────────────────────── */
+/* ── Emoji / color pickers ──────────────────── */
 function buildEmojiPicker() {
   emojiPickerEl.innerHTML = '';
   EMOJIS.forEach((emoji) => {
@@ -110,7 +116,6 @@ function buildEmojiPicker() {
     btn.type = 'button';
     btn.className = 'emoji-btn' + (emoji === selectedEmoji ? ' selected' : '');
     btn.textContent = emoji;
-    btn.setAttribute('aria-label', emoji);
     btn.addEventListener('click', () => {
       selectedEmoji = emoji;
       emojiPickerEl.querySelectorAll('.emoji-btn').forEach((b) => b.classList.remove('selected'));
@@ -120,7 +125,6 @@ function buildEmojiPicker() {
   });
 }
 
-/* ── Color picker ───────────────────────────── */
 function buildColorPicker() {
   colorPickerEl.innerHTML = '';
   COLORS.forEach((color) => {
@@ -139,11 +143,10 @@ function buildColorPicker() {
 }
 
 /* ── Create course ──────────────────────────── */
-createCourseForm.addEventListener('submit', (e) => {
+createCourseForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const name = courseNameInput.value.trim();
-
   if (!name) {
     courseNameInput.classList.add('invalid');
     courseNameError.textContent = 'Please enter a course name.';
@@ -152,67 +155,58 @@ createCourseForm.addEventListener('submit', (e) => {
     return;
   }
 
-  /* Clear any previous error */
   courseNameInput.classList.remove('invalid');
   courseNameError.classList.remove('visible');
 
-  const course = {
-    id:          crypto.randomUUID(),
-    name,
-    emoji:       selectedEmoji,
-    color:       selectedColor,
-    notes:       '',
-    questions:   [],
-    createdAt:   new Date().toISOString(),
-    lastStudied: null,
-  };
+  const submitBtn = createCourseForm.querySelector('.btn-submit-modal');
+  submitBtn.disabled   = true;
+  submitBtn.textContent = 'Creating…';
 
-  /* Add newest course first */
-  courses.unshift(course);
-  saveCourses();
-  closeModal();
-
-  /* Navigate immediately to the new course's studio */
-  window.location.href = `studio.html?id=${course.id}`;
+  try {
+    const course = await apiFetch('POST', '/api/courses', {
+      name,
+      emoji: selectedEmoji,
+      color: selectedColor,
+    });
+    closeModal();
+    /* Navigate straight to the new course's studio */
+    window.location.href = `studio.html?id=${course.id}`;
+  } catch (err) {
+    courseNameError.textContent = err.message || 'Failed to create course.';
+    courseNameError.classList.add('visible');
+    submitBtn.disabled    = false;
+    submitBtn.textContent = 'Create Course';
+  }
 });
-
-/* ── Load / save ────────────────────────────── */
-function loadCourses() {
-  courses = JSON.parse(localStorage.getItem('sb_courses') || '[]');
-}
-
-function saveCourses() {
-  localStorage.setItem('sb_courses', JSON.stringify(courses));
-}
 
 /* ── Render courses grid ────────────────────── */
 function renderCourses() {
   const hasCourses = courses.length > 0;
-
-  emptyState.style.display       = hasCourses ? 'none'  : 'block';
-  dashCoursesGrid.style.display  = hasCourses ? 'grid'  : 'none';
+  emptyState.style.display      = hasCourses ? 'none'  : 'block';
+  dashCoursesGrid.style.display = hasCourses ? 'grid'  : 'none';
 
   if (!hasCourses) return;
 
-  /* Build hex lookup from COLORS constant */
   const colorMap = Object.fromEntries(COLORS.map((c) => [c.id, c.hex]));
 
   dashCoursesGrid.innerHTML = courses.map((course) => {
-    const hex        = colorMap[course.color] || '#6c63ff';
-    const qCount     = course.questions.length;
-    const lastDate   = course.lastStudied ? formatRelativeDate(new Date(course.lastStudied)) : 'Never';
-    const nameHtml   = escapeHtml(course.name);
+    const hex      = colorMap[course.color] || '#6c63ff';
+    const qCount   = course.question_count  || 0;
+    const lastDate = course.last_studied
+      ? formatRelativeDate(new Date(course.last_studied))
+      : 'Never';
 
     return `
       <div class="dash-course-card" data-id="${course.id}">
         <div class="dash-card-top"
-             style="background: linear-gradient(135deg,${hex}26,${hex}0f);
-                    border-bottom: 1px solid ${hex}40;">
+             style="background:linear-gradient(135deg,${hex}26,${hex}0f);
+                    border-bottom:1px solid ${hex}40;">
           <span class="dash-card-emoji">${course.emoji}</span>
-          <button class="dash-card-delete" data-id="${course.id}" aria-label="Delete ${nameHtml}">✕</button>
+          <button class="dash-card-delete" data-id="${course.id}"
+                  aria-label="Delete ${escapeHtml(course.name)}">✕</button>
         </div>
         <div class="dash-card-body">
-          <h3>${nameHtml}</h3>
+          <h3>${escapeHtml(course.name)}</h3>
           <div class="dash-card-meta">
             <span>${qCount} question${qCount !== 1 ? 's' : ''}</span>
             <span class="meta-dot">·</span>
@@ -224,36 +218,34 @@ function renderCourses() {
     `;
   }).join('');
 
-  /* Bind delete buttons after rendering */
+  /* Delete buttons */
   dashCoursesGrid.querySelectorAll('.dash-card-delete').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
-      const id = btn.getAttribute('data-id');
+      const id         = btn.getAttribute('data-id');
       const courseName = courses.find((c) => c.id === id)?.name || 'this course';
       if (!confirm(`Delete "${courseName}"? This cannot be undone.`)) return;
-      courses = courses.filter((c) => c.id !== id);
-      saveCourses();
-      renderCourses();
+      try {
+        await apiFetch('DELETE', `/api/courses/${id}`);
+        courses = courses.filter((c) => c.id !== id);
+        renderCourses();
+      } catch (err) {
+        alert(`Could not delete: ${err.message}`);
+      }
     });
   });
 }
 
 /* ── Helpers ────────────────────────────────── */
-
-/* Escapes HTML special chars to prevent XSS from user-entered course names */
 function escapeHtml(str) {
   return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-/* Returns a human-readable relative date ("Today", "Yesterday", "3 days ago") */
 function formatRelativeDate(date) {
-  const diffMs   = Date.now() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const diffDays = Math.floor((Date.now() - date.getTime()) / 86400000);
   if (diffDays === 0) return 'Today';
   if (diffDays === 1) return 'Yesterday';
   if (diffDays < 7)  return `${diffDays} days ago`;

@@ -243,7 +243,8 @@
     </div>
   </div>
 
-  <!-- studio.js must load after the DOM -->
+  <!-- api.js must load first — provides apiFetch, getToken, clearSession -->
+  <script src="api.js"></script>
   <script src="studio.js"></script>
 </body>
 </html>

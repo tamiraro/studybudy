@@ -51,12 +51,56 @@ No CI — push directly to `master`.
 
 ## Running the app
 
-Open `index.html` directly in a browser — no build step, no server required.
+Two steps:
+
+**1. Start the backend** (keep this terminal open):
+```
+cd backend
+start.bat          # Windows — runs python app.py
+# or directly:
+python app.py
+```
+
+**2. Open the frontend** in a browser:
+```
+index.html   (open directly — no build step needed)
+```
+
+Health check: http://127.0.0.1:5000/api/health
 
 Headless screenshot (Edge):
 ```
 & "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --headless=new --screenshot=screenshot.png --window-size=1280,900 --disable-gpu --no-sandbox "file:///C:/Users/tamir1/Desktop/Programming/studybudy/index.html"
 ```
+
+## Backend architecture
+
+```
+backend/
+  app.py          — Flask entry point; registers blueprints; CORS config
+  config.py       — DB_DRIVER, DB_PATH, SECRET_KEY, PORT (all overridable via env vars)
+  setup_db.py     — Run once: creates StudyBudy.accdb and all 4 tables
+  start.bat       — Convenience launcher for Windows
+  requirements.txt
+  StudyBudy.accdb — MS Access database (gitignored)
+
+  db/
+    base.py        — Abstract repository interfaces (UserRepo, SessionRepo, CourseRepo, QuestionRepo)
+    access_db.py   — MS Access implementation (pyodbc + Jet/ACE SQL)
+    __init__.py    — Factory: get_repos() → (users, sessions, courses, questions) tuple
+
+  api/
+    auth.py        — POST /api/auth/signup, /login; DELETE /api/auth/logout
+    courses.py     — GET/POST /api/courses; GET/PUT/DELETE /api/courses/<id>
+    questions.py   — GET/POST /api/courses/<id>/questions; DELETE /api/courses/<id>/questions/<qid>
+    middleware.py  — require_auth decorator (reads Bearer token from Authorization header)
+```
+
+**Switching databases:** Change `DB_DRIVER` in `config.py` (or set `SB_DB_DRIVER` env var).
+Then implement `db/<name>.py` subclassing the same abstract repos, add an `elif` in `db/__init__.py`.
+No routes change — they only call repository methods.
+
+**API base URL** lives in one place: `api.js → API_BASE`. Change it to deploy against any server.
 
 ## File structure and CSS architecture
 

@@ -1,3 +1,11 @@
 .claude/
 *.png
 *.jpg
+
+# MS Access database — binary file, not version-controlled.
+# Run backend/setup_db.py to recreate it locally.
+backend/StudyBudy.accdb
+backend/__pycache__/
+backend/db/__pycache__/
+backend/api/__pycache__/
+

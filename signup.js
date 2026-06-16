@@ -314,7 +314,7 @@ document.querySelectorAll('.toggle-password').forEach((btn) => {
 /* =============================================
    FORM SUBMIT — validate all fields at once
    ============================================= */
-form.addEventListener('submit', (e) => {
+form.addEventListener('submit', async (e) => {
   e.preventDefault(); /* prevent native browser submission */
 
   /* Run all validators and collect results */
@@ -345,17 +345,31 @@ form.addEventListener('submit', (e) => {
     return;
   }
 
-  /* ── All valid: save user to localStorage and go to dashboard ── */
-  const userData = {
-    firstName: firstNameInput.value.trim(),
-    lastName:  lastNameInput.value.trim(),
-    username:  usernameInput.value.trim(),
-    email:     emailInput.value.trim(),
-    phone:     phoneInput.value.trim(),
-    role:      form.querySelector('input[name="role"]:checked').value,
-    /* Password is never stored client-side */
-  };
+  /* ── All valid: POST to /api/auth/signup ── */
+  submitBtn.disabled   = true;
+  submitBtn.textContent = 'Creating account…';
 
-  localStorage.setItem('sb_user', JSON.stringify(userData));
-  window.location.href = 'dashboard.html';
+  try {
+    const data = await apiFetch('POST', '/api/auth/signup', {
+      firstName: firstNameInput.value.trim(),
+      lastName:  lastNameInput.value.trim(),
+      username:  usernameInput.value.trim(),
+      email:     emailInput.value.trim().toLowerCase(),
+      phone:     phoneInput.value.trim(),
+      role:      form.querySelector('input[name="role"]:checked').value,
+      password:  passwordInput.value,
+    });
+
+    /* Store session and navigate to the dashboard */
+    saveSession(data.user, data.token);
+    window.location.href = 'dashboard.html';
+  } catch (err) {
+    /* Show server error (e.g. duplicate username) above the submit button */
+    submitBtn.disabled    = false;
+    submitBtn.textContent = 'Create Account';
+    /* Re-use the username error span for server-level errors */
+    showError(usernameInput, document.getElementById('usernameError'),
+      err.message || 'Could not create account. Please try again.');
+    usernameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
 });

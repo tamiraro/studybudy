@@ -104,44 +104,44 @@ document.querySelectorAll('.toggle-password').forEach((btn) => {
 });
 
 /* =============================================
-   FORM SUBMIT
+   FORM SUBMIT — calls POST /api/auth/login
    ============================================= */
-form.addEventListener('submit', (e) => {
+form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const allValid = [runIdentifier(), runPassword()].every(Boolean);
 
   if (!allValid) {
-    /* Shake the submit button */
     submitBtn.classList.remove('shake');
-    void submitBtn.offsetWidth; /* force reflow so animation restarts */
+    void submitBtn.offsetWidth;
     submitBtn.classList.add('shake');
     submitBtn.addEventListener('animationend', () => submitBtn.classList.remove('shake'), { once: true });
-
-    /* Focus the first invalid field */
     const firstInvalid = form.querySelector('.invalid');
     if (firstInvalid) firstInvalid.focus();
     return;
   }
 
-  /* ── All valid: look up stored user ── */
-  const identifier = identifierInput.value.trim();
-  const stored     = JSON.parse(localStorage.getItem('sb_user') || 'null');
+  /* Disable button while the request is in-flight */
+  submitBtn.disabled   = true;
+  submitBtn.textContent = 'Logging in…';
 
-  /* Client-side only: accept the login if a matching account exists in localStorage.
-     In a real app this check happens server-side. */
-  const match = stored && (
-    stored.username === identifier ||
-    stored.email    === identifier
-  );
+  try {
+    const data = await apiFetch('POST', '/api/auth/login', {
+      identifier: identifierInput.value.trim(),
+      password:   document.getElementById('loginPassword').value,
+    });
 
-  if (!match) {
-    showError(identifierInput, document.getElementById('identifierError'),
-      'Account not found. Please check your details or sign up.');
-    return;
+    /* Store session and navigate to dashboard */
+    saveSession(data.user, data.token);
+    window.location.href = 'dashboard.html';
+  } catch (err) {
+    /* Show a single vague error — same message for wrong user OR wrong password */
+    showError(
+      identifierInput,
+      document.getElementById('identifierError'),
+      err.message || 'Invalid credentials.',
+    );
+    submitBtn.disabled    = false;
+    submitBtn.textContent = 'Log In';
   }
-
-  /* Persist the session and go to the dashboard */
-  localStorage.setItem('sb_user', JSON.stringify(stored));
-  window.location.href = 'dashboard.html';
 });
