@@ -23,7 +23,6 @@ const phoneInput        = document.getElementById('phone');
 const passwordInput     = document.getElementById('password');
 const confirmInput      = document.getElementById('confirmPassword');
 const rolePicker        = document.getElementById('rolePicker');
-const coursesPicker     = document.querySelector('.courses-picker');
 const submitBtn         = document.querySelector('.btn-submit');
 
 /* =============================================
@@ -87,13 +86,6 @@ function validateRole() {
   return { ok: true };
 }
 
-function validateCourses() {
-  const checked = form.querySelectorAll('input[name="courses"]:checked');
-  if (checked.length === 0)
-    return { ok: false, msg: 'Please select at least one course.' };
-  return { ok: true };
-}
-
 function validatePassword(value) {
   if (!value) return { ok: false, msg: 'Password is required.' };
   if (value.length < 8)
@@ -143,6 +135,7 @@ function clearPickerError(pickerEl, errorEl) {
   errorEl.textContent = '';
   errorEl.classList.remove('visible');
 }
+
 
 /* =============================================
    FIELD-LEVEL VALIDATION RUNNERS
@@ -195,14 +188,6 @@ function runRole() {
   r.ok
     ? clearPickerError(rolePicker, document.getElementById('roleError'))
     : showPickerError(rolePicker, document.getElementById('roleError'), r.msg);
-  return r.ok;
-}
-
-function runCourses() {
-  const r = validateCourses();
-  r.ok
-    ? clearPickerError(coursesPicker, document.getElementById('coursesError'))
-    : showPickerError(coursesPicker, document.getElementById('coursesError'), r.msg);
   return r.ok;
 }
 
@@ -263,24 +248,6 @@ document.querySelectorAll('.role-card').forEach((card) => {
     card.classList.add('selected');
     /* Clear the role error immediately when a choice is made */
     clearPickerError(rolePicker, document.getElementById('roleError'));
-  });
-});
-
-/* =============================================
-   COURSE CHECKBOX CARDS — toggle .selected on click
-   ============================================= */
-document.querySelectorAll('.course-checkbox-card').forEach((card) => {
-  card.addEventListener('click', () => {
-    /* Toggle is handled by the browser (checkbox state changes automatically).
-       We mirror the checkbox state as a .selected class on the card for styling. */
-    const cb = card.querySelector('input[type="checkbox"]');
-    /* Use setTimeout(0) so the click event updates cb.checked before we read it */
-    setTimeout(() => {
-      card.classList.toggle('selected', cb.checked);
-      /* Clear courses error as soon as at least one course is chosen */
-      if (document.querySelectorAll('input[name="courses"]:checked').length > 0)
-        clearPickerError(coursesPicker, document.getElementById('coursesError'));
-    }, 0);
   });
 });
 
@@ -358,7 +325,6 @@ form.addEventListener('submit', (e) => {
     runEmail(),
     runPhone(),
     runRole(),
-    runCourses(),
     runPassword(),
     runConfirm(),
   ];
@@ -379,19 +345,17 @@ form.addEventListener('submit', (e) => {
     return;
   }
 
-  /* ── All valid: collect form data ── */
-  const data = {
+  /* ── All valid: save user to localStorage and go to dashboard ── */
+  const userData = {
     firstName: firstNameInput.value.trim(),
     lastName:  lastNameInput.value.trim(),
     username:  usernameInput.value.trim(),
     email:     emailInput.value.trim(),
     phone:     phoneInput.value.trim(),
     role:      form.querySelector('input[name="role"]:checked').value,
-    courses:   [...form.querySelectorAll('input[name="courses"]:checked')].map((cb) => cb.value),
-    /* Never log passwords in production — this is a placeholder */
+    /* Password is never stored client-side */
   };
 
-  /* Placeholder: log to console until a backend is connected */
-  console.log('Sign up submitted:', data);
-  alert(`Welcome, ${data.firstName}! Account creation will be wired up to a backend soon.`);
+  localStorage.setItem('sb_user', JSON.stringify(userData));
+  window.location.href = 'dashboard.html';
 });

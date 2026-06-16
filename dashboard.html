@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Courses — StudyBudy</title>
+  <!-- Shared base: CSS variables, reset, navbar, modals -->
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Dashboard-specific layout and course cards -->
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+<body>
+
+  <!-- =============================================
+       NAVBAR
+       Shows user greeting on the right.
+       dashboard.js populates #userGreeting and handles logout.
+       ============================================= -->
+  <header class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="logo logo-link">
+        <span class="logo-icon">📚</span>
+        <span class="logo-text">StudyBudy</span>
+      </a>
+      <nav class="nav-links">
+        <span class="user-greeting" id="userGreeting"></span>
+        <!-- nav-link-btn: a <button> styled to look like a nav link -->
+        <button class="nav-link-btn" id="logoutBtn">Log Out</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- =============================================
+       DASHBOARD MAIN
+       Authenticated user sees their course library here.
+       dashboard.js guards this page — redirects to login.html
+       if no user session exists in localStorage.
+       ============================================= -->
+  <main class="dashboard-page">
+    <div class="dashboard-inner">
+
+      <!-- Page header row: title + new-course button -->
+      <div class="dashboard-header">
+        <div>
+          <h1>My Courses</h1>
+          <p class="dash-subtitle">Your personal study library</p>
+        </div>
+        <button class="btn-new-course" id="btnNewCourse">+ New Course</button>
+      </div>
+
+      <!-- Course cards grid — populated dynamically by dashboard.js -->
+      <div class="dash-courses-grid" id="dashCoursesGrid"></div>
+
+      <!-- Empty state: shown when the user has no courses yet -->
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">📂</div>
+        <h3>No courses yet</h3>
+        <p>Create your first course and start turning notes into practice questions.</p>
+        <button class="btn-primary" id="emptyNewCourse">Create My First Course</button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- =============================================
+       CREATE COURSE MODAL
+       Shown when the user clicks "New Course".
+       dashboard.js handles open/close and form submission.
+       ============================================= -->
+  <div class="modal-overlay" id="modalOverlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+
+      <div class="modal-header">
+        <h2 id="modalTitle">New Course</h2>
+        <button class="modal-close" id="modalClose" aria-label="Close modal">&times;</button>
+      </div>
+
+      <form id="createCourseForm" novalidate>
+
+        <!-- Course name input -->
+        <div class="modal-field">
+          <label for="courseName">Course Name</label>
+          <input
+            type="text"
+            id="courseName"
+            placeholder="e.g. Organic Chemistry"
+            maxlength="60"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <span class="field-error" id="courseNameError"></span>
+        </div>
+
+        <!-- Emoji picker: click to select the course icon -->
+        <div class="modal-field">
+          <label>Icon</label>
+          <div class="emoji-picker" id="emojiPicker">
+            <!-- Buttons injected by dashboard.js -->
+          </div>
+        </div>
+
+        <!-- Color picker: click to select the course card color -->
+        <div class="modal-field">
+          <label>Color</label>
+          <div class="color-picker" id="colorPicker">
+            <!-- Buttons injected by dashboard.js -->
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit-modal">Create Course</button>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- dashboard.js must load after the DOM -->
+  <script src="dashboard.js"></script>
+</body>
+</html>

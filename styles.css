@@ -444,6 +444,310 @@ body {
 }
 
 /* =============================================
+   LOGO AS LINK
+   The logo <a> tag needs no underline/color override.
+   ============================================= */
+.logo-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* =============================================
+   HERO BADGE
+   Small pill above the hero headline.
+   ============================================= */
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent-glow);
+  color: var(--accent-light);
+  border: 1px solid rgba(108, 99, 255, 0.3);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+}
+
+/* =============================================
+   HERO CTAS — side-by-side button row
+   ============================================= */
+.hero-ctas {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Ghost button — secondary action alongside .btn-primary */
+.btn-ghost {
+  display: inline-block;
+  padding: 13px 26px;
+  color: var(--text-muted);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: 1px solid var(--border);
+  transition: color 0.2s, border-color 0.2s;
+}
+.btn-ghost:hover { color: var(--text); border-color: var(--text-muted); }
+
+/* Small variant of btn-primary — used inside cards / panels */
+.btn-primary-sm {
+  display: inline-block;
+  padding: 9px 20px;
+  background: var(--accent);
+  color: #fff;
+  text-decoration: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-primary-sm:hover { background: var(--accent-light); }
+
+/* =============================================
+   FLOATING CARD CONTENT
+   Inner structure of the hero decorative cards.
+   ============================================= */
+.fc-icon { font-size: 1.3rem; flex-shrink: 0; }
+.fc-content { display: flex; flex-direction: column; gap: 3px; }
+.fc-label { font-size: 0.7rem; color: var(--text-muted); font-weight: 500; }
+.fc-value { font-size: 0.875rem; font-weight: 600; }
+
+/* =============================================
+   HOW IT WORKS SECTION
+   Three-step walkthrough below the features strip.
+   ============================================= */
+.how-it-works {
+  padding: 80px 24px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.how-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Centered variant of section-header — used in how-it-works */
+.section-header.centered {
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+/* Three-column step grid with arrow dividers between steps */
+.steps-grid {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.step-card {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  transition: border-color 0.2s;
+}
+.step-card:hover { border-color: var(--accent); }
+
+.step-number {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.step-icon {
+  font-size: 1.8rem;
+  margin-bottom: 12px;
+}
+
+.step-card h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.step-card p {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.step-arrow {
+  font-size: 1.4rem;
+  color: var(--border);
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .steps-grid { flex-direction: column; }
+  .step-arrow { transform: rotate(90deg); }
+  .step-card { width: 100%; }
+}
+
+/* =============================================
+   SHARED MODAL STYLES
+   Used by both dashboard.html and studio.html.
+   ============================================= */
+
+/* Full-screen dark overlay — becomes visible by adding .active */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.modal-overlay.active { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+  animation: modal-in 0.18s ease;
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-header h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.3rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.15s;
+}
+.modal-close:hover { color: var(--text); }
+
+/* Generic form field inside modal */
+.modal-field {
+  padding: 0 24px;
+  margin-top: 18px;
+}
+
+.modal-field label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.modal-field input[type="text"],
+.modal-field input[type="password"] {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 0.95rem;
+  font-family: var(--font);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.modal-field input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.modal-field input.invalid { border-color: #e63946; }
+
+.btn-submit-modal {
+  display: block;
+  width: calc(100% - 48px);
+  margin: 20px 24px 24px;
+  padding: 11px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-submit-modal:hover { background: var(--accent-light); }
+
+/* =============================================
+   SHARED FIELD ERROR
+   Used across forms in all pages.
+   The .visible class is added by JS to show the message.
+   ============================================= */
+.field-error {
+  display: none;
+  font-size: 0.78rem;
+  color: #e63946;
+  margin-top: 5px;
+}
+.field-error.visible { display: block; }
+
+/* =============================================
+   NAV LINK BUTTON
+   A <button> styled to look like a plain nav text link.
+   Used for "Log Out" on dashboard and "⚙ API Key" on studio.
+   ============================================= */
+.nav-link-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  font-family: var(--font);
+  transition: color 0.2s;
+}
+.nav-link-btn:hover { color: var(--text); }
+
+/* User greeting text in the navbar (dashboard) */
+.user-greeting {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* =============================================
    FOOTER
    ============================================= */
 .footer {

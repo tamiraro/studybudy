@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Study Studio — StudyBudy</title>
+  <!-- Shared base: CSS variables, reset, navbar, modals -->
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Studio-specific layout, tabs, flashcard, quiz -->
+  <link rel="stylesheet" href="studio.css" />
+</head>
+<body>
+
+  <!-- =============================================
+       NAVBAR
+       Left side: back link + course title (injected by studio.js).
+       Right side: API key settings button.
+       ============================================= -->
+  <header class="navbar">
+    <div class="navbar-inner">
+      <div class="studio-nav-left">
+        <a href="dashboard.html" class="back-link">← My Courses</a>
+        <div class="studio-course-title">
+          <span id="courseEmojiDisplay"></span>
+          <span id="courseNameDisplay"></span>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <!-- Opens the API key modal to let the user set/change their Anthropic key -->
+        <button class="nav-link-btn" id="settingsBtn">⚙ API Key</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- =============================================
+       STUDIO MAIN
+       Protected page — studio.js redirects to login.html
+       if no user session exists. Loads the course by ?id= URL param.
+       ============================================= -->
+  <main class="studio-page">
+
+    <!-- Tab bar: switches between the three studio panels -->
+    <div class="tab-bar">
+      <div class="tab-bar-inner">
+        <button class="tab-btn active" data-tab="notes">Notes</button>
+        <!-- Question count is updated dynamically by studio.js -->
+        <button class="tab-btn" data-tab="questions">Questions (0)</button>
+        <button class="tab-btn" data-tab="quiz">Quiz</button>
+      </div>
+    </div>
+
+    <!-- =============================================
+         NOTES PANEL
+         User pastes study material here. The sidebar
+         contains the generate button and tips.
+         Auto-saves notes to localStorage on every keystroke.
+         ============================================= -->
+    <div class="tab-panel active" data-panel="notes">
+      <div class="panel-inner">
+        <div class="notes-layout">
+
+          <!-- Main notes area -->
+          <div class="notes-main">
+            <div class="notes-header">
+              <h2>Study Notes</h2>
+              <!-- Character count updates live via studio.js -->
+              <span class="char-count" id="charCount">0 characters</span>
+            </div>
+            <textarea
+              id="notesTextarea"
+              class="notes-textarea"
+              placeholder="Paste your lecture notes, textbook sections, or any study material here…&#10;&#10;The more detail you include, the better the practice questions will be."
+              spellcheck="true"
+            ></textarea>
+          </div>
+
+          <!-- Sidebar with action button and tips -->
+          <div class="notes-sidebar">
+            <div class="sidebar-card">
+              <h3>Generate Questions</h3>
+              <p>Let Claude AI read your notes and create targeted practice questions.</p>
+              <button class="btn-generate" id="generateBtn">Generate Questions</button>
+              <!-- Status message: shown after generation attempt (success/error/loading) -->
+              <div class="generate-status" id="generateStatus"></div>
+            </div>
+
+            <div class="sidebar-card tips-card">
+              <h3>Tips for better questions</h3>
+              <ul>
+                <li>Include definitions and key terms</li>
+                <li>Add worked examples from your notes</li>
+                <li>Include formulas or step-by-step processes</li>
+                <li>More detail → more targeted questions</li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- =============================================
+         QUESTIONS PANEL
+         Shows all generated Q&A pairs. Each card has a
+         "Show / Hide Answer" toggle and a delete button.
+         ============================================= -->
+    <div class="tab-panel" data-panel="questions">
+      <div class="panel-inner">
+
+        <div class="questions-header">
+          <!-- qCount badge updated by studio.js -->
+          <h2>Practice Questions <span class="q-badge" id="qCount">0</span></h2>
+        </div>
+
+        <!-- Empty state: shown when no questions have been generated yet -->
+        <div class="q-empty-state" id="qEmptyState">
+          <div class="q-empty-icon">🤖</div>
+          <h3>No questions yet</h3>
+          <p>Go to the Notes tab, paste your study material, and click "Generate Questions".</p>
+          <button class="btn-primary-sm" id="goToNotesBtn">Go to Notes</button>
+        </div>
+
+        <!-- Question cards injected by studio.js -->
+        <div id="questionsList"></div>
+
+      </div>
+    </div>
+
+    <!-- =============================================
+         QUIZ PANEL
+         Flashcard-style quiz mode. Shuffles questions,
+         lets user mark each as "Know It" or "Still Learning".
+         Questions marked "Still Learning" loop back for another pass.
+         ============================================= -->
+    <div class="tab-panel" data-panel="quiz">
+      <div class="panel-inner quiz-panel-inner">
+
+        <!-- Empty state: shown when no questions exist yet -->
+        <div class="quiz-empty" id="quizEmpty">
+          <div class="quiz-empty-icon">🎯</div>
+          <h3>Nothing to quiz on yet</h3>
+          <p>Generate some practice questions first, then come back to quiz yourself.</p>
+          <button class="btn-primary-sm" id="quizGoToNotesBtn">Get Questions</button>
+        </div>
+
+        <!-- Flashcard UI — shown when quiz is in progress -->
+        <div class="quiz-card-wrap" id="quizCard">
+
+          <!-- Progress indicator: "3 / 12" + fill bar -->
+          <div class="quiz-progress-row">
+            <span class="quiz-progress-text" id="quizProgress">1 / 8</span>
+            <div class="quiz-progress-track">
+              <div class="quiz-progress-fill" id="quizProgressBar"></div>
+            </div>
+          </div>
+
+          <!-- The flashcard itself -->
+          <div class="flashcard">
+            <div class="flashcard-label">Question</div>
+            <div class="flashcard-question" id="quizQuestion"></div>
+
+            <!-- Reveal button hides itself and shows the answer + rating buttons -->
+            <button class="btn-reveal" id="quizRevealBtn">Reveal Answer</button>
+            <div class="flashcard-answer" id="quizAnswer"></div>
+
+            <!-- Rating buttons: visible only after answer is revealed -->
+            <div class="quiz-actions" id="quizActions">
+              <button class="btn-still-learning" id="quizLearnBtn">Still Learning</button>
+              <button class="btn-known" id="quizKnownBtn">Know It ✓</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Done state: shown when quiz session is complete -->
+        <div class="quiz-done" id="quizDone">
+          <div class="quiz-done-icon">🎉</div>
+          <h3>Session Complete!</h3>
+          <p>You went through all the questions in this session.</p>
+          <div class="quiz-done-stats">
+            <div class="done-stat">
+              <span class="done-stat-num green" id="quizDoneKnown">0</span>
+              <span class="done-stat-label">Knew it</span>
+            </div>
+            <div class="done-stat">
+              <span class="done-stat-num amber" id="quizDoneLearn">0</span>
+              <span class="done-stat-label">Still learning</span>
+            </div>
+          </div>
+          <button class="btn-generate" id="quizRestartBtn">Restart Quiz</button>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- =============================================
+       API KEY MODAL
+       Shown on first "Generate" click, or via the "⚙ API Key" nav button.
+       The key is stored in localStorage (sb_apikey) and sent only to Anthropic.
+       ============================================= -->
+  <div class="modal-overlay" id="apiKeyModal" aria-hidden="true">
+    <div class="modal api-modal" role="dialog" aria-modal="true" aria-labelledby="apiModalTitle">
+
+      <div class="modal-header">
+        <h2 id="apiModalTitle">Anthropic API Key</h2>
+        <button class="modal-close" id="apiKeyCancel" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="api-modal-body">
+        <p>StudyBudy uses the Claude AI API to generate practice questions. Enter your Anthropic API key below to get started.</p>
+
+        <div class="modal-field">
+          <label for="apiKeyInput">API Key</label>
+          <input
+            type="password"
+            id="apiKeyInput"
+            placeholder="sk-ant-api03-..."
+            spellcheck="false"
+            autocomplete="off"
+          />
+          <!-- Inline error shown when key format is wrong -->
+          <span class="field-error" id="apiKeyError"></span>
+        </div>
+
+        <!-- External link to Anthropic Console — opens in new tab -->
+        <a
+          href="https://console.anthropic.com/account/keys"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="api-link"
+        >Get an API key from Anthropic Console →</a>
+
+        <!-- Security notice -->
+        <p class="api-warning">
+          Your key is stored only in your browser (localStorage) and is sent exclusively to Anthropic's servers to generate questions.
+        </p>
+
+        <button class="btn-submit-modal" id="apiKeySave">Save &amp; Continue</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- studio.js must load after the DOM -->
+  <script src="studio.js"></script>
+</body>
+</html>

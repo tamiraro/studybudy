@@ -1,0 +1,631 @@
+/* =============================================
+   STUDIO PAGE STYLES
+   Inherits all CSS variables and base styles from styles.css.
+   This file only defines studio-specific layout and components.
+   ============================================= */
+
+/* =============================================
+   NAVBAR OVERRIDES FOR STUDIO
+   The studio navbar has a two-section left side
+   instead of the standard logo.
+   ============================================= */
+.studio-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.back-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+.back-link:hover { color: var(--text); }
+
+/* Course title next to the back link */
+.studio-course-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Separator between back link and course title */
+.studio-nav-left::after {
+  content: '';
+  display: block;
+  width: 1px;
+  height: 18px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* =============================================
+   PAGE LAYOUT
+   Pushes content below fixed navbar.
+   ============================================= */
+.studio-page {
+  padding-top: 60px; /* height of fixed navbar */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =============================================
+   TAB BAR
+   Full-width bar below the navbar; contains three tab buttons.
+   ============================================= */
+.tab-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 60px; /* stick just below the navbar */
+  z-index: 50;
+}
+
+.tab-bar-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  gap: 4px;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: var(--font);
+  padding: 14px 18px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.tab-btn:hover { color: var(--text); }
+/* Active tab gets a purple underline and full text color */
+.tab-btn.active {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+/* =============================================
+   TAB PANELS
+   Only the .active panel is visible.
+   ============================================= */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+.panel-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 36px 24px 80px;
+}
+
+/* =============================================
+   NOTES PANEL — TWO-COLUMN LAYOUT
+   Left: large textarea. Right: sidebar with action card.
+   ============================================= */
+.notes-layout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 24px;
+  align-items: start;
+}
+
+.notes-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.notes-header h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.char-count {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.notes-textarea {
+  width: 100%;
+  min-height: 480px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 0.92rem;
+  font-family: var(--font);
+  line-height: 1.7;
+  padding: 18px;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.notes-textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.notes-textarea::placeholder { color: var(--text-muted); opacity: 0.6; }
+
+/* ── Sidebar ── */
+.notes-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 120px; /* below navbar + tab bar */
+}
+
+.sidebar-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar-card h3 {
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.sidebar-card p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* Generate Questions button */
+.btn-generate {
+  padding: 10px 18px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: background 0.2s;
+  width: 100%;
+}
+.btn-generate:hover:not(:disabled) { background: var(--accent-light); }
+.btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Status message after generate attempt */
+.generate-status {
+  font-size: 0.8rem;
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  display: none;
+}
+.generate-status.loading { color: var(--text-muted); }
+.generate-status.success {
+  background: rgba(46, 196, 130, 0.1);
+  color: #2ec482;
+  border: 1px solid rgba(46, 196, 130, 0.2);
+  display: block;
+}
+.generate-status.error {
+  background: rgba(230, 57, 70, 0.1);
+  color: #e63946;
+  border: 1px solid rgba(230, 57, 70, 0.2);
+  display: block;
+}
+.generate-status.loading { display: block; }
+
+/* Tips list inside sidebar */
+.tips-card ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.tips-card li {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  padding-left: 14px;
+  position: relative;
+  line-height: 1.4;
+}
+
+.tips-card li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-size: 0.7rem;
+}
+
+@media (max-width: 800px) {
+  .notes-layout { grid-template-columns: 1fr; }
+  .notes-sidebar { position: static; }
+}
+
+/* =============================================
+   QUESTIONS PANEL
+   ============================================= */
+.questions-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.questions-header h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Question count badge next to the heading */
+.q-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 22px;
+  padding: 0 8px;
+  background: var(--accent-glow);
+  color: var(--accent-light);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* Empty state inside questions tab */
+.q-empty-state {
+  text-align: center;
+  padding: 64px 24px;
+}
+
+.q-empty-icon { font-size: 3rem; margin-bottom: 14px; }
+.q-empty-state h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+.q-empty-state p { color: var(--text-muted); font-size: 0.875rem; max-width: 320px; margin: 0 auto 20px; }
+
+/* Individual question card */
+.question-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  transition: border-color 0.15s;
+}
+.question-card:hover { border-color: var(--accent); }
+
+.question-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.q-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Zero-padded question number */
+.q-num {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Type badge: recall / conceptual / application */
+.q-type {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+.q-type.recall      { background: rgba(67, 97, 238, 0.15); color: #6d8eff; }
+.q-type.conceptual  { background: rgba(108, 99, 255, 0.15); color: var(--accent-light); }
+.q-type.application { background: rgba(46, 196, 160, 0.15); color: #2ec4a0; }
+
+/* Delete question button */
+.q-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+.q-delete:hover { color: #e63946; background: rgba(230, 57, 70, 0.1); }
+
+/* Question text */
+.q-question {
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+/* Show/hide answer row */
+.q-answer-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.q-reveal-btn {
+  align-self: flex-start;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: var(--font);
+  transition: border-color 0.15s, color 0.15s;
+}
+.q-reveal-btn:hover { border-color: var(--accent); color: var(--accent-light); }
+
+/* Answer text — hidden by default, shown on toggle */
+.q-answer {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  background: var(--surface-2);
+  border-left: 3px solid var(--accent);
+  padding: 10px 14px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.q-answer.hidden { display: none; }
+
+/* =============================================
+   QUIZ PANEL
+   ============================================= */
+.quiz-panel-inner {
+  max-width: 640px; /* narrower for flashcard feel */
+  margin: 0 auto;
+}
+
+/* Empty state inside quiz tab */
+.quiz-empty {
+  text-align: center;
+  padding: 64px 24px;
+}
+.quiz-empty-icon { font-size: 3rem; margin-bottom: 14px; }
+.quiz-empty h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+.quiz-empty p  { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 20px; }
+
+/* Flashcard wrapper */
+.quiz-card-wrap { display: none; }
+
+/* Progress row: "3 / 12" text + bar */
+.quiz-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.quiz-progress-text {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.quiz-progress-track {
+  flex: 1;
+  height: 4px;
+  background: var(--surface-2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.quiz-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* The flashcard itself */
+.flashcard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 240px;
+}
+
+.flashcard-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--accent);
+}
+
+.flashcard-question {
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+/* Reveal answer button */
+.btn-reveal {
+  align-self: flex-start;
+  padding: 10px 22px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: var(--font);
+  transition: border-color 0.15s;
+}
+.btn-reveal:hover { border-color: var(--accent); }
+
+/* Answer text — hidden by default; studio.js sets display:block on reveal */
+.flashcard-answer {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  background: var(--surface-2);
+  border-left: 3px solid var(--accent);
+  padding: 12px 16px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  display: none;
+}
+
+/* Rating buttons row — visible after answer is revealed */
+.quiz-actions {
+  display: none;
+  gap: 10px;
+}
+.quiz-actions.visible { display: flex; }
+
+/* "Still Learning" button — amber color */
+.btn-still-learning {
+  flex: 1;
+  padding: 11px;
+  background: rgba(248, 152, 32, 0.12);
+  border: 1px solid rgba(248, 152, 32, 0.3);
+  color: #f89820;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: var(--font);
+  transition: background 0.15s;
+}
+.btn-still-learning:hover { background: rgba(248, 152, 32, 0.22); }
+
+/* "Know It" button — green color */
+.btn-known {
+  flex: 1;
+  padding: 11px;
+  background: rgba(46, 196, 130, 0.12);
+  border: 1px solid rgba(46, 196, 130, 0.3);
+  color: #2ec482;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: var(--font);
+  transition: background 0.15s;
+}
+.btn-known:hover { background: rgba(46, 196, 130, 0.22); }
+
+/* ── Quiz done state ── */
+.quiz-done {
+  text-align: center;
+  padding: 48px 24px;
+  display: none;
+}
+
+.quiz-done-icon { font-size: 3rem; margin-bottom: 14px; }
+.quiz-done h3   { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; }
+.quiz-done > p  { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 28px; }
+
+.quiz-done-stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 28px;
+}
+
+.done-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.done-stat-num {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.done-stat-num.green { color: #2ec482; }
+.done-stat-num.amber { color: #f89820; }
+
+.done-stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* =============================================
+   API KEY MODAL BODY
+   Extra content inside the shared .modal container.
+   ============================================= */
+.api-modal-body {
+  padding: 20px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.api-modal-body > p:first-child {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* External link to Anthropic Console */
+.api-link {
+  font-size: 0.82rem;
+  color: var(--accent-light);
+  text-decoration: none;
+}
+.api-link:hover { text-decoration: underline; }
+
+/* Security disclaimer below the API key input */
+.api-warning {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--border);
+}
+
+/* Override btn-submit-modal margins inside api-modal-body
+   (the shared styles add 24px horizontal margin, not needed here) */
+.api-modal-body .btn-submit-modal {
+  width: 100%;
+  margin: 4px 0 0;
+}

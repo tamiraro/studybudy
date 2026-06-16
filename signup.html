@@ -24,7 +24,6 @@
       </a>
       <nav class="nav-links">
         <a href="index.html">Home</a>
-        <a href="index.html#courses">Courses</a>
         <a href="login.html">Log In</a>
       </nav>
     </div>
@@ -142,32 +141,6 @@
             </label>
           </div>
           <span class="field-error" id="roleError"></span>
-        </div>
-
-        <!-- Courses selection — checkboxes, one per available course.
-             To add a new course later: copy a .course-checkbox-card and update
-             the value + label to match the new course name. -->
-        <div class="form-group" id="coursesGroup">
-          <label>Courses I want to study</label>
-          <div class="courses-picker">
-
-            <label class="course-checkbox-card" id="courseJavaCard">
-              <input type="checkbox" name="courses" value="intro-java" />
-              <span class="course-cb-icon">☕</span>
-              <span class="course-cb-label">Intro to CS with Java</span>
-              <!-- Checkmark shown when selected — toggled via CSS + :checked -->
-              <span class="course-cb-check">✓</span>
-            </label>
-
-            <label class="course-checkbox-card" id="courseLinalgCard">
-              <input type="checkbox" name="courses" value="linear-algebra" />
-              <span class="course-cb-icon">📐</span>
-              <span class="course-cb-label">Linear Algebra</span>
-              <span class="course-cb-check">✓</span>
-            </label>
-
-          </div>
-          <span class="field-error" id="coursesError"></span>
         </div>
 
         <!-- Password -->

@@ -3,80 +3,92 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StudyBudy</title>
-  <!-- All styles live in styles.css — no inline styles anywhere in this file -->
+  <title>StudyBudy — AI-Powered Practice Questions</title>
+  <!-- All styles live in styles.css — no inline styles in this file -->
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
   <!-- =============================================
        NAVBAR
-       Fixed at top; uses backdrop-filter blur.
-       Nav links (#about, #courses) are highlighted
-       dynamically by the IntersectionObserver in app.js.
+       Fixed overlay with blur backdrop.
+       Nav links are highlighted on scroll by app.js.
        ============================================= -->
   <header class="navbar">
     <div class="navbar-inner">
-      <div class="logo">
+      <a href="index.html" class="logo logo-link">
         <span class="logo-icon">📚</span>
         <span class="logo-text">StudyBudy</span>
-      </div>
+      </a>
       <nav class="nav-links">
-        <!-- href values must match the id of the target <section> elements below -->
-        <a href="#about">About</a>
-        <a href="#courses">Courses</a>
+        <a href="#how-it-works">How it works</a>
         <a href="login.html">Log In</a>
-        <a href="signup.html" class="nav-signup">Sign Up</a>
+        <a href="signup.html" class="nav-signup">Get Started Free</a>
       </nav>
     </div>
   </header>
 
   <!-- =============================================
-       HERO SECTION  (id="about" — targeted by navbar)
-       Two-column layout: left = text content,
-       right = decorative floating cards + radial glow blob.
-       The floating cards animate via CSS @keyframes float.
+       HERO SECTION  (id="hero" — full-viewport opener)
+       Two-column layout: left = headline + stats + CTAs,
+       right = decorative floating AI cards + glow blob.
+       Floating cards animate via CSS @keyframes float.
        ============================================= -->
-  <section class="hero" id="about">
+  <section class="hero" id="hero">
 
-    <!-- Left column: headline, subtitle, stats, CTA -->
+    <!-- Left column: headline, subtitle, stats, CTAs -->
     <div class="hero-content">
-      <h1>Your Personal<br /><span class="accent">Study Companion</span></h1>
+      <!-- AI badge pill — purely decorative, no link -->
+      <div class="hero-badge">✨ Powered by Claude AI</div>
+
+      <h1>Turn Your Notes Into<br /><span class="accent">Perfect Practice Questions</span></h1>
       <p class="hero-subtitle">
-        StudyBudy helps you master your courses with organized materials,
-        practice questions, and smart review tools — all in one place.
+        Paste your study material and let AI generate targeted practice questions.
+        No more guessing what'll be on the exam — know exactly where you stand.
       </p>
 
-      <!-- Quick stats strip — update numbers here as courses/features are added -->
+      <!-- Quick stats strip -->
       <div class="hero-stats">
         <div class="stat">
-          <span class="stat-number">2</span>
-          <span class="stat-label">Courses</span>
+          <span class="stat-number">AI</span>
+          <span class="stat-label">Generated</span>
         </div>
         <div class="stat-divider"></div>
         <div class="stat">
           <span class="stat-number">∞</span>
-          <span class="stat-label">Practice</span>
+          <span class="stat-label">Questions</span>
         </div>
         <div class="stat-divider"></div>
         <div class="stat">
-          <span class="stat-number">1</span>
-          <span class="stat-label">Goal: Pass</span>
+          <span class="stat-number">Any</span>
+          <span class="stat-label">Subject</span>
         </div>
       </div>
 
-      <!-- Scrolls to #courses section -->
-      <a href="#courses" class="btn-primary">Browse Courses</a>
+      <!-- Two CTAs: primary action + secondary scroll link -->
+      <div class="hero-ctas">
+        <a href="signup.html" class="btn-primary">Start for Free →</a>
+        <a href="#how-it-works" class="btn-ghost">See how it works</a>
+      </div>
     </div>
 
-    <!-- Right column: purely decorative, no interactive elements -->
+    <!-- Right column: purely decorative floating UI snippets -->
     <div class="hero-visual">
-      <!-- card-a and card-b have different animation-delay values in CSS to stagger the float -->
+      <!-- card-a: simulates an AI-generated question bubble -->
       <div class="floating-card card-a">
-        <span>☕</span> Java Basics
+        <span class="fc-icon">🤖</span>
+        <div class="fc-content">
+          <div class="fc-label">AI question</div>
+          <div class="fc-value">What is Big-O notation?</div>
+        </div>
       </div>
+      <!-- card-b: simulates a session progress indicator -->
       <div class="floating-card card-b">
-        <span>📐</span> Linear Algebra
+        <span class="fc-icon">✅</span>
+        <div class="fc-content">
+          <div class="fc-label">Session progress</div>
+          <div class="fc-value">8 / 12 mastered</div>
+        </div>
       </div>
       <!-- Blurred radial gradient that gives the purple glow behind the cards -->
       <div class="hero-blob"></div>
@@ -86,77 +98,70 @@
 
   <!-- =============================================
        FEATURES STRIP
-       Three static cards highlighting app benefits.
+       Three cards highlighting the core workflow.
        No interactivity — purely informational.
        ============================================= -->
   <section class="features">
     <div class="features-inner">
       <div class="feature-item">
+        <div class="feature-icon">📝</div>
+        <h3>Paste Your Notes</h3>
+        <p>Any subject, any format. Lecture notes, textbook excerpts, study guides — just paste them in.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🤖</div>
+        <h3>AI Question Generator</h3>
+        <p>Claude AI reads your material and crafts targeted recall, conceptual, and application questions.</p>
+      </div>
+      <div class="feature-item">
         <div class="feature-icon">🎯</div>
-        <h3>Focused Learning</h3>
-        <p>Course-specific content so you study what actually matters for your exam.</p>
-      </div>
-      <div class="feature-item">
-        <div class="feature-icon">🔁</div>
-        <h3>Active Recall</h3>
-        <p>Practice problems and flashcards that force your brain to retrieve knowledge.</p>
-      </div>
-      <div class="feature-item">
-        <div class="feature-icon">📈</div>
-        <h3>Track Progress</h3>
-        <p>See exactly where you stand and what still needs work before the test.</p>
+        <h3>Quiz Yourself</h3>
+        <p>Flashcard-style quiz mode tracks what you know vs. what still needs work — session by session.</p>
       </div>
     </div>
   </section>
 
   <!-- =============================================
-       COURSES SECTION  (id="courses" — targeted by navbar + hero CTA)
-       Grid of course cards. Each card has:
-         - a colored banner (.course-card-top) defined by a modifier class (e.g. java-bg)
-         - a body with tag, title, description, and action button
-       Buttons are disabled until the course page is built.
-       To add a new course, copy one card block and update the content.
-       Color modifier classes (java-bg, linalg-bg, ...) are defined in styles.css.
+       HOW IT WORKS  (id="how-it-works" — targeted by nav link + hero CTA)
+       Three-step visual walkthrough of the core study flow.
        ============================================= -->
-  <section class="courses-section" id="courses">
-    <div class="courses-inner">
-      <div class="section-header">
-        <h2>Your Courses</h2>
-        <p>Pick a course to start studying</p>
-      </div>
-      <div class="courses-grid">
+  <section class="how-it-works" id="how-it-works">
+    <div class="how-inner">
 
-        <!-- Course card: Introduction to Computer Science with Java -->
-        <div class="course-card">
-          <!-- java-bg: amber gradient defined in styles.css -->
-          <div class="course-card-top java-bg">
-            <span class="course-emoji">☕</span>
-          </div>
-          <div class="course-card-body">
-            <span class="course-tag">Computer Science</span>
-            <h3>Introduction to Computer Science with Java</h3>
-            <p>Learn the fundamentals of programming and problem-solving using the Java language.</p>
-            <!-- course page is live — links to courses/java/index.html -->
-            <a href="courses/java/index.html" class="btn-course btn-course-active">Open Course</a>
-          </div>
+      <div class="section-header centered">
+        <h2>How it works</h2>
+        <p>From raw notes to exam-ready in under a minute</p>
+      </div>
+
+      <div class="steps-grid">
+
+        <div class="step-card">
+          <div class="step-number">01</div>
+          <div class="step-icon">📂</div>
+          <h3>Create a Course</h3>
+          <p>Give it a name and pick a color. Organize by class, topic, or anything that works for you.</p>
         </div>
 
-        <!-- Course card: Linear Algebra -->
-        <div class="course-card">
-          <!-- linalg-bg: teal gradient defined in styles.css -->
-          <div class="course-card-top linalg-bg">
-            <span class="course-emoji">📐</span>
-          </div>
-          <div class="course-card-body">
-            <span class="course-tag">Mathematics</span>
-            <h3>Linear Algebra</h3>
-            <p>Explore vectors, matrices, transformations, and the mathematical structures behind modern computing.</p>
-            <!-- disabled until the course page is implemented -->
-            <button class="btn-course" disabled>Coming Soon</button>
-          </div>
+        <div class="step-arrow">→</div>
+
+        <div class="step-card">
+          <div class="step-number">02</div>
+          <div class="step-icon">📋</div>
+          <h3>Paste Your Notes</h3>
+          <p>Copy in your lecture notes, textbook sections, or any study material you want to master.</p>
+        </div>
+
+        <div class="step-arrow">→</div>
+
+        <div class="step-card">
+          <div class="step-number">03</div>
+          <div class="step-icon">✨</div>
+          <h3>Get Practice Questions</h3>
+          <p>AI generates a full set of targeted questions. Review them, then hit quiz mode to drill down.</p>
         </div>
 
       </div>
+
     </div>
   </section>
 
@@ -167,7 +172,7 @@
     <p>StudyBudy &copy; 2026 — built to help you succeed.</p>
   </footer>
 
-  <!-- app.js must load after the DOM so querySelectorAll finds the sections -->
+  <!-- app.js handles scroll-driven nav highlight via IntersectionObserver -->
   <script src="app.js"></script>
 </body>
 </html>

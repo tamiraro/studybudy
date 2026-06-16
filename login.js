@@ -124,13 +124,24 @@ form.addEventListener('submit', (e) => {
     return;
   }
 
-  /* ── All valid: collect data ── */
-  const data = {
-    identifier:  identifierInput.value.trim(),
-    rememberMe:  document.getElementById('rememberMe').checked,
-    /* Password never logged — placeholder until backend is connected */
-  };
+  /* ── All valid: look up stored user ── */
+  const identifier = identifierInput.value.trim();
+  const stored     = JSON.parse(localStorage.getItem('sb_user') || 'null');
 
-  console.log('Login submitted:', data);
-  alert(`Logging in as "${data.identifier}"… (backend not connected yet)`);
+  /* Client-side only: accept the login if a matching account exists in localStorage.
+     In a real app this check happens server-side. */
+  const match = stored && (
+    stored.username === identifier ||
+    stored.email    === identifier
+  );
+
+  if (!match) {
+    showError(identifierInput, document.getElementById('identifierError'),
+      'Account not found. Please check your details or sign up.');
+    return;
+  }
+
+  /* Persist the session and go to the dashboard */
+  localStorage.setItem('sb_user', JSON.stringify(stored));
+  window.location.href = 'dashboard.html';
 });
