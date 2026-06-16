@@ -198,6 +198,15 @@ class AccessCourseRepo(CourseRepo):
         self.conn.commit()
         return cur.rowcount > 0
 
+    def update_summary(self, course_id: str, user_id: int, summary_json: str) -> bool:
+        cur = self.conn.cursor()
+        cur.execute(
+            "UPDATE courses SET summary = ? WHERE id = ? AND user_id = ?",
+            summary_json, course_id, user_id,
+        )
+        self.conn.commit()
+        return cur.rowcount > 0
+
     def touch_last_studied(self, course_id: str, user_id: int) -> bool:
         cur = self.conn.cursor()
         cur.execute(
@@ -246,11 +255,14 @@ class AccessQuestionRepo(QuestionRepo):
         for q in questions:
             cur.execute(
                 """INSERT INTO questions
-                   (id, course_id, question_text, answer_text, question_type, created_at)
-                   VALUES (?, ?, ?, ?, ?, ?)""",
+                   (id, course_id, question_text, answer_text,
+                    question_type, difficulty, created_at)
+                   VALUES (?, ?, ?, ?, ?, ?, ?)""",
                 q["id"], course_id,
                 q["question_text"], q["answer_text"],
-                q.get("question_type", "recall"), now,
+                q.get("question_type", "recall"),
+                q.get("difficulty", "medium"),
+                now,
             )
             self.conn.commit()
             cur.execute("SELECT * FROM questions WHERE id = ?", q["id"])

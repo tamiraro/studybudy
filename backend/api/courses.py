@@ -1,14 +1,15 @@
 """
 api/courses.py — Course CRUD endpoints (all require auth).
 
-GET    /api/courses           list user's courses (includes question count)
-POST   /api/courses           create a course
-GET    /api/courses/<id>      get one course + its notes
-PUT    /api/courses/<id>/notes  save notes text
-DELETE /api/courses/<id>      delete course + all its questions
+GET    /api/courses              list user's courses (includes question count)
+POST   /api/courses              create a course
+GET    /api/courses/<id>         get one course + questions + summary
+PUT    /api/courses/<id>/notes   save notes text
+PUT    /api/courses/<id>/summary save AI-generated summary (JSON string)
+DELETE /api/courses/<id>         delete course + all its questions
 """
 
-import uuid
+import uuid, json
 from flask import Blueprint, request, jsonify, g
 from db import get_repos
 from api.middleware import require_auth
@@ -63,6 +64,14 @@ def get_course(course_id):
 
     course["questions"]      = question_repo.get_by_course(course_id)
     course["question_count"] = len(course["questions"])
+
+    # Parse the stored summary JSON string into a dict for the client
+    raw_summary = course.get("summary") or ""
+    try:
+        course["summary"] = json.loads(raw_summary) if raw_summary else None
+    except (json.JSONDecodeError, TypeError):
+        course["summary"] = None
+
     return jsonify(course), 200
 
 
@@ -74,6 +83,23 @@ def update_notes(course_id):
 
     _, _, course_repo, _ = get_repos()
     ok = course_repo.update_notes(course_id, g.user_id, notes)
+    if not ok:
+        return jsonify({"error": "Course not found or not yours."}), 404
+
+    return jsonify({"ok": True}), 200
+
+
+@courses_bp.route("/<course_id>/summary", methods=["PUT"])
+@require_auth
+def update_summary(course_id):
+    data = request.get_json(silent=True) or {}
+    summary = data.get("summary")   # expects a dict or None
+    if summary is None:
+        return jsonify({"error": "summary is required."}), 400
+
+    _, _, course_repo, _ = get_repos()
+    # Store summary as a JSON string in the MEMO column
+    ok = course_repo.update_summary(course_id, g.user_id, json.dumps(summary))
     if not ok:
         return jsonify({"error": "Course not found or not yours."}), 404
 

@@ -80,6 +80,10 @@ class CourseRepo(ABC):
         """Persist updated notes text; return True on success."""
 
     @abstractmethod
+    def update_summary(self, course_id: str, user_id: int, summary_json: str) -> bool:
+        """Persist AI-generated summary as a JSON string; return True on success."""
+
+    @abstractmethod
     def touch_last_studied(self, course_id: str, user_id: int) -> bool:
         """Set last_studied to NOW; return True on success."""
 
@@ -102,7 +106,7 @@ class QuestionRepo(ABC):
         """
         Insert multiple questions at once.
         Each item in `questions` is a dict with keys:
-            id, question_text, answer_text, question_type
+            id, question_text, answer_text, question_type, difficulty
         Returns the list of created question dicts.
         """
 

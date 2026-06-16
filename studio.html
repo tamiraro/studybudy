@@ -6,8 +6,13 @@
   <title>Study Studio — StudyBudy</title>
   <!-- Shared base: CSS variables, reset, navbar, modals -->
   <link rel="stylesheet" href="styles.css" />
-  <!-- Studio-specific layout, tabs, flashcard, quiz -->
+  <!-- Studio-specific layout, tabs, flashcard, quiz, file upload -->
   <link rel="stylesheet" href="studio.css" />
+
+  <!-- PDF text extraction (used by studio.js for .pdf file uploads) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <!-- Word doc text extraction (used by studio.js for .docx file uploads) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 </head>
 <body>
 
@@ -26,7 +31,6 @@
         </div>
       </div>
       <nav class="nav-links">
-        <!-- Opens the API key modal to let the user set/change their Anthropic key -->
         <button class="nav-link-btn" id="settingsBtn">⚙ API Key</button>
       </nav>
     </div>
@@ -34,26 +38,26 @@
 
   <!-- =============================================
        STUDIO MAIN
-       Protected page — studio.js redirects to login.html
-       if no user session exists. Loads the course by ?id= URL param.
+       Auth-guarded — studio.js redirects to login.html if no session.
+       Loads the course by ?id= URL param.
        ============================================= -->
   <main class="studio-page">
 
-    <!-- Tab bar: switches between the three studio panels -->
+    <!-- Tab bar: four tabs — Notes, Questions, Quiz, Summary -->
     <div class="tab-bar">
       <div class="tab-bar-inner">
         <button class="tab-btn active" data-tab="notes">Notes</button>
-        <!-- Question count is updated dynamically by studio.js -->
+        <!-- Question count is updated dynamically -->
         <button class="tab-btn" data-tab="questions">Questions (0)</button>
         <button class="tab-btn" data-tab="quiz">Quiz</button>
+        <button class="tab-btn" data-tab="summary">Summary</button>
       </div>
     </div>
 
     <!-- =============================================
          NOTES PANEL
-         User pastes study material here. The sidebar
-         contains the generate button and tips.
-         Auto-saves notes to localStorage on every keystroke.
+         User pastes or uploads study material here.
+         Notes auto-save to the database after 1 s of inactivity.
          ============================================= -->
     <div class="tab-panel active" data-panel="notes">
       <div class="panel-inner">
@@ -63,33 +67,70 @@
           <div class="notes-main">
             <div class="notes-header">
               <h2>Study Notes</h2>
-              <!-- Character count updates live via studio.js -->
               <span class="char-count" id="charCount">0 characters</span>
             </div>
+
+            <!-- Notes textarea — main text input -->
             <textarea
               id="notesTextarea"
               class="notes-textarea"
-              placeholder="Paste your lecture notes, textbook sections, or any study material here…&#10;&#10;The more detail you include, the better the practice questions will be."
+              placeholder="Paste your lecture notes, textbook sections, or any study material here…&#10;&#10;Or drop files below — PDF, Word, and text files are all supported."
               spellcheck="true"
             ></textarea>
+
+            <!-- ── File upload zone ──────────────────────────────────
+                 Supports drag-and-drop and click-to-browse.
+                 Accepted: .txt .md .pdf .docx .csv
+                 Extracted text is APPENDED to the textarea above.
+                 studio.js handles reading via FileReader + PDF.js + Mammoth.
+                 ──────────────────────────────────────────────────── -->
+            <div class="file-upload-zone" id="fileDropZone">
+              <div class="file-upload-icon">📎</div>
+              <div class="file-upload-body">
+                <span class="file-upload-text">
+                  Drop files here, or
+                  <button type="button" class="file-browse-link" id="fileBrowseBtn">browse</button>
+                </span>
+                <span class="file-upload-hint">PDF, Word (.docx), TXT, MD — text extracted and appended to notes</span>
+              </div>
+              <!-- Hidden input; triggered by browse button and drag-drop -->
+              <input
+                type="file"
+                id="fileInput"
+                accept=".txt,.md,.pdf,.docx,.csv"
+                multiple
+                style="display:none"
+              />
+            </div>
+
+            <!-- List of successfully processed files (injected by studio.js) -->
+            <div class="uploaded-files" id="uploadedFiles"></div>
           </div>
 
-          <!-- Sidebar with action button and tips -->
+          <!-- Sidebar with generate button and tips -->
           <div class="notes-sidebar">
             <div class="sidebar-card">
-              <h3>Generate Questions</h3>
-              <p>Let Claude AI read your notes and create targeted practice questions.</p>
-              <button class="btn-generate" id="generateBtn">Generate Questions</button>
-              <!-- Status message: shown after generation attempt (success/error/loading) -->
+              <h3>Generate Questions &amp; Summary</h3>
+              <p>Claude AI reads your notes and creates levelled practice questions <em>and</em> a structured summary.</p>
+              <button class="btn-generate" id="generateBtn">Generate</button>
               <div class="generate-status" id="generateStatus"></div>
             </div>
 
             <div class="sidebar-card tips-card">
-              <h3>Tips for better questions</h3>
+              <h3>What you'll get</h3>
               <ul>
-                <li>Include definitions and key terms</li>
-                <li>Add worked examples from your notes</li>
-                <li>Include formulas or step-by-step processes</li>
+                <li><strong>Easy</strong> — definitions, key terms</li>
+                <li><strong>Medium</strong> — concepts, relationships</li>
+                <li><strong>Hard</strong> — application, analysis</li>
+                <li><strong>Summary</strong> — key concepts + quick reference</li>
+              </ul>
+            </div>
+
+            <div class="sidebar-card tips-card">
+              <h3>Tips for better results</h3>
+              <ul>
+                <li>Include definitions and examples</li>
+                <li>Add formulas or step-by-step processes</li>
                 <li>More detail → more targeted questions</li>
               </ul>
             </div>
@@ -101,26 +142,32 @@
 
     <!-- =============================================
          QUESTIONS PANEL
-         Shows all generated Q&A pairs. Each card has a
-         "Show / Hide Answer" toggle and a delete button.
+         Q&A cards grouped by difficulty level.
+         Each card: number, type badge, difficulty badge, question, reveal answer.
          ============================================= -->
     <div class="tab-panel" data-panel="questions">
       <div class="panel-inner">
 
         <div class="questions-header">
-          <!-- qCount badge updated by studio.js -->
           <h2>Practice Questions <span class="q-badge" id="qCount">0</span></h2>
+          <!-- Difficulty filter buttons — toggled by studio.js -->
+          <div class="q-filter-bar" id="qFilterBar">
+            <button class="q-filter-btn active" data-filter="all">All</button>
+            <button class="q-filter-btn" data-filter="easy">Easy</button>
+            <button class="q-filter-btn" data-filter="medium">Medium</button>
+            <button class="q-filter-btn" data-filter="hard">Hard</button>
+          </div>
         </div>
 
-        <!-- Empty state: shown when no questions have been generated yet -->
+        <!-- Empty state -->
         <div class="q-empty-state" id="qEmptyState">
           <div class="q-empty-icon">🤖</div>
           <h3>No questions yet</h3>
-          <p>Go to the Notes tab, paste your study material, and click "Generate Questions".</p>
+          <p>Go to the Notes tab, add your study material, and click "Generate".</p>
           <button class="btn-primary-sm" id="goToNotesBtn">Go to Notes</button>
         </div>
 
-        <!-- Question cards injected by studio.js -->
+        <!-- Question cards injected by studio.js, grouped by level -->
         <div id="questionsList"></div>
 
       </div>
@@ -128,42 +175,59 @@
 
     <!-- =============================================
          QUIZ PANEL
-         Flashcard-style quiz mode. Shuffles questions,
-         lets user mark each as "Know It" or "Still Learning".
-         Questions marked "Still Learning" loop back for another pass.
+         Flashcard-style self-test. Each card shows the difficulty level.
          ============================================= -->
     <div class="tab-panel" data-panel="quiz">
       <div class="panel-inner quiz-panel-inner">
 
+        <!-- Quiz difficulty selector — pick which level to drill -->
+        <div class="quiz-level-picker" id="quizLevelPicker">
+          <h3>Quiz on:</h3>
+          <div class="quiz-level-options">
+            <label class="quiz-level-label">
+              <input type="radio" name="quizLevel" value="all" checked /> All levels
+            </label>
+            <label class="quiz-level-label">
+              <input type="radio" name="quizLevel" value="easy" /> Easy only
+            </label>
+            <label class="quiz-level-label">
+              <input type="radio" name="quizLevel" value="medium" /> Medium only
+            </label>
+            <label class="quiz-level-label">
+              <input type="radio" name="quizLevel" value="hard" /> Hard only
+            </label>
+          </div>
+          <button class="btn-generate" id="startQuizBtn">Start Quiz</button>
+        </div>
+
         <!-- Empty state: shown when no questions exist yet -->
-        <div class="quiz-empty" id="quizEmpty">
+        <div class="quiz-empty" id="quizEmpty" style="display:none">
           <div class="quiz-empty-icon">🎯</div>
           <h3>Nothing to quiz on yet</h3>
-          <p>Generate some practice questions first, then come back to quiz yourself.</p>
+          <p>Generate practice questions first, then come back here to quiz yourself.</p>
           <button class="btn-primary-sm" id="quizGoToNotesBtn">Get Questions</button>
         </div>
 
         <!-- Flashcard UI — shown when quiz is in progress -->
-        <div class="quiz-card-wrap" id="quizCard">
+        <div class="quiz-card-wrap" id="quizCard" style="display:none">
 
-          <!-- Progress indicator: "3 / 12" + fill bar -->
           <div class="quiz-progress-row">
             <span class="quiz-progress-text" id="quizProgress">1 / 8</span>
             <div class="quiz-progress-track">
               <div class="quiz-progress-fill" id="quizProgressBar"></div>
             </div>
+            <button class="quiz-end-btn" id="quizEndBtn">End</button>
           </div>
 
-          <!-- The flashcard itself -->
           <div class="flashcard">
-            <div class="flashcard-label">Question</div>
+            <!-- Difficulty badge on the card -->
+            <div class="flashcard-meta">
+              <span class="flashcard-label">Question</span>
+              <span class="flashcard-difficulty" id="quizDiffBadge"></span>
+            </div>
             <div class="flashcard-question" id="quizQuestion"></div>
-
-            <!-- Reveal button hides itself and shows the answer + rating buttons -->
             <button class="btn-reveal" id="quizRevealBtn">Reveal Answer</button>
             <div class="flashcard-answer" id="quizAnswer"></div>
-
-            <!-- Rating buttons: visible only after answer is revealed -->
             <div class="quiz-actions" id="quizActions">
               <button class="btn-still-learning" id="quizLearnBtn">Still Learning</button>
               <button class="btn-known" id="quizKnownBtn">Know It ✓</button>
@@ -172,8 +236,8 @@
 
         </div>
 
-        <!-- Done state: shown when quiz session is complete -->
-        <div class="quiz-done" id="quizDone">
+        <!-- Done state -->
+        <div class="quiz-done" id="quizDone" style="display:none">
           <div class="quiz-done-icon">🎉</div>
           <h3>Session Complete!</h3>
           <p>You went through all the questions in this session.</p>
@@ -187,7 +251,55 @@
               <span class="done-stat-label">Still learning</span>
             </div>
           </div>
-          <button class="btn-generate" id="quizRestartBtn">Restart Quiz</button>
+          <button class="btn-generate" id="quizRestartBtn">Quiz Again</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- =============================================
+         SUMMARY PANEL
+         AI-generated structured summary of the notes.
+         Contains: key concepts list, main takeaways paragraph,
+         and a quick-reference section.
+         ============================================= -->
+    <div class="tab-panel" data-panel="summary">
+      <div class="panel-inner">
+
+        <!-- Empty state: shown before any generation -->
+        <div class="summary-empty" id="summaryEmpty">
+          <div class="summary-empty-icon">📋</div>
+          <h3>No summary yet</h3>
+          <p>Click "Generate" in the Notes tab to create an AI summary of your material.</p>
+          <button class="btn-primary-sm" id="summaryGoToNotesBtn">Go to Notes</button>
+        </div>
+
+        <!-- Summary content (hidden until generated) -->
+        <div class="summary-content" id="summaryContent" style="display:none">
+
+          <div class="summary-header">
+            <h2>AI Summary</h2>
+            <button class="btn-regen" id="summaryRegenBtn">Regenerate</button>
+          </div>
+
+          <!-- Key concepts: rendered as pill tags -->
+          <div class="summary-section">
+            <div class="summary-section-title">Key Concepts</div>
+            <div class="concept-tags" id="summaryConcepts"></div>
+          </div>
+
+          <!-- Main takeaways: paragraph text -->
+          <div class="summary-section">
+            <div class="summary-section-title">Main Takeaways</div>
+            <div class="summary-text" id="summaryTakeaways"></div>
+          </div>
+
+          <!-- Quick reference: definitions / formulas in a card -->
+          <div class="summary-section">
+            <div class="summary-section-title">Quick Reference</div>
+            <pre class="summary-ref" id="summaryRef"></pre>
+          </div>
+
         </div>
 
       </div>
@@ -196,54 +308,34 @@
   </main>
 
   <!-- =============================================
-       API KEY MODAL
-       Shown on first "Generate" click, or via the "⚙ API Key" nav button.
-       The key is stored in localStorage (sb_apikey) and sent only to Anthropic.
+       ANTHROPIC API KEY MODAL
+       User's own Claude API key — stored client-side only.
        ============================================= -->
   <div class="modal-overlay" id="apiKeyModal" aria-hidden="true">
     <div class="modal api-modal" role="dialog" aria-modal="true" aria-labelledby="apiModalTitle">
-
       <div class="modal-header">
         <h2 id="apiModalTitle">Anthropic API Key</h2>
         <button class="modal-close" id="apiKeyCancel" aria-label="Close">&times;</button>
       </div>
-
       <div class="api-modal-body">
-        <p>StudyBudy uses the Claude AI API to generate practice questions. Enter your Anthropic API key below to get started.</p>
-
+        <p>StudyBudy uses the Claude AI API to generate questions and summaries. Enter your Anthropic API key below.</p>
         <div class="modal-field">
           <label for="apiKeyInput">API Key</label>
-          <input
-            type="password"
-            id="apiKeyInput"
-            placeholder="sk-ant-api03-..."
-            spellcheck="false"
-            autocomplete="off"
-          />
-          <!-- Inline error shown when key format is wrong -->
+          <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..."
+                 spellcheck="false" autocomplete="off" />
           <span class="field-error" id="apiKeyError"></span>
         </div>
-
-        <!-- External link to Anthropic Console — opens in new tab -->
-        <a
-          href="https://console.anthropic.com/account/keys"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="api-link"
-        >Get an API key from Anthropic Console →</a>
-
-        <!-- Security notice -->
+        <a href="https://console.anthropic.com/account/keys" target="_blank"
+           rel="noopener noreferrer" class="api-link">Get a key from Anthropic Console →</a>
         <p class="api-warning">
-          Your key is stored only in your browser (localStorage) and is sent exclusively to Anthropic's servers to generate questions.
+          Your key is stored only in this browser and sent only to Anthropic's servers.
         </p>
-
         <button class="btn-submit-modal" id="apiKeySave">Save &amp; Continue</button>
       </div>
-
     </div>
   </div>
 
-  <!-- api.js must load first — provides apiFetch, getToken, clearSession -->
+  <!-- api.js first — provides apiFetch, getToken, clearSession -->
   <script src="api.js"></script>
   <script src="studio.js"></script>
 </body>

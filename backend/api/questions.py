@@ -13,7 +13,8 @@ from api.middleware import require_auth
 
 questions_bp = Blueprint("questions", __name__)
 
-VALID_TYPES = {"recall", "conceptual", "application"}
+VALID_TYPES       = {"recall", "conceptual", "application"}
+VALID_DIFFICULTIES = {"easy", "medium", "hard"}
 
 
 @questions_bp.route("/api/courses/<course_id>/questions", methods=["GET"])
@@ -55,11 +56,16 @@ def add_questions(course_id):
         if qtype not in VALID_TYPES:
             qtype = "recall"
 
+        difficulty = q.get("difficulty") or "medium"
+        if difficulty not in VALID_DIFFICULTIES:
+            difficulty = "medium"
+
         cleaned.append({
             "id":            str(uuid.uuid4()),
             "question_text": qt,
             "answer_text":   at,
             "question_type": qtype,
+            "difficulty":    difficulty,
         })
 
     # Update last_studied timestamp when questions are added
